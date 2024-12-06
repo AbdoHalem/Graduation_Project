@@ -73,7 +73,7 @@ def predict_sign(image_path):
     # Print the result
     if probabilityValue > 0.75:  # You can adjust this threshold
         className = getClassName(classIndex)
-        print(f"Class: {className}")
+        print(f"Sign Type is: {className}")
         return className
     else:
         print("No sign detected")
@@ -96,8 +96,6 @@ def Sending(s, message):
             s.send(bytes(message, "utf-8"))
     except Exception as e:
         print("Error sending message:", e)
-    # finally:
-    #     s.close()
 
 # Main code
 if __name__ == "__main__" :
@@ -107,7 +105,7 @@ if __name__ == "__main__" :
     client_connect(SOCKET)
     try:
         for i in range(5):
-            message = predict_sign(image_path)
+            message = "Sign Type is: " + predict_sign(image_path)
             try:
                 Sending(SOCKET, message)
             except KeyboardInterrupt:
