@@ -32,7 +32,8 @@ def Receiving(s):
 
 SOCKET = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 server_IP = socket.gethostbyname("Halem-Lab")
-SOCKET.connect((server_IP, 1234))
+port = 1234
+SOCKET.connect((server_IP, port))
 print("Connected to server.")
 
 try:
