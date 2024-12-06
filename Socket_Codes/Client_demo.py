@@ -4,22 +4,45 @@ from threading import Thread
 # Function to send data from client to server
 def Sending(s):
     while True : 
-        msg = input()
-        s.send(bytes(msg,"utf-8"))
+        try:
+            msg = input()
+            if msg.lower() == 'exit':  # Exit condition
+                s.send(bytes("exit", "utf-8"))  # Notify server
+                s.close()
+                break
+            s.send(bytes(msg, "utf-8"))
+        except Exception as e:
+            print("Error sending message:", e)
+            s.close()
+            break
 
 # Function to receive data from server to client
-def Receving(s):
+def Receiving(s):
     while True : 
-        msg = s.recv(500)
-        print(msg.decode("utf-8"))
+        try:
+            msg = s.recv(500)
+            if not msg or msg.decode("utf-8").lower() == 'exit':  # Exit condition
+                print("Server disconnected.")
+                s.close()
+                break
+            print("Received Message:", msg.decode("utf-8"))
+        except Exception as e:
+            print("Error receiving message:", e)
+            break
 
 SOCKET = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-SOCKET.connect(("192.168.1.4", 1234))
-print(socket.gethostbyname(socket.gethostname()))
+server_IP = socket.gethostbyname("Halem-Lab")
+SOCKET.connect((server_IP, 1234))
+print("Connected to server.")
 
-while True :
-    Thread_1 = Thread(target=Sending, args=(SOCKET, ))
-    Thread_2 = Thread(target=Receving, args=(SOCKET, ))
-    Thread_1.start()
-    Thread_2.start()
-
+try:
+    send_thread = Thread(target=Sending, args=(SOCKET,))
+    recv_thread = Thread(target=Receiving, args=(SOCKET,))
+    send_thread.start()
+    recv_thread.start()
+    send_thread.join()
+    recv_thread.join()
+except KeyboardInterrupt:
+    print("\nShutting down the client.")
+finally:
+    SOCKET.close()
