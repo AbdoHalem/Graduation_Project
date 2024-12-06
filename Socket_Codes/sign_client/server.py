@@ -12,7 +12,7 @@ def Receiving(client_socket, stop_flag):
                 stop_flag["stop"] = True
                 break
             # Receive the message from the client
-            print("Received Message:", msg.decode("utf-8"))
+            print(msg.decode("utf-8"))
         except Exception as e:
             print("Error receiving message:", e)
             stop_flag["stop"] = True
