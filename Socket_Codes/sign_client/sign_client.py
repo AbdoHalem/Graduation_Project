@@ -1,14 +1,15 @@
 import os
 import numpy as np
 import cv2
+from pathlib import Path
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'    # To disaple displaying the tensorflow logs
 from tensorflow.keras.models import load_model
 import socket 
-from threading import Thread
+# from threading import Thread
 
-# Load the trained model
-MODEL_PATH = 'sign_client\model.h5'
-model = load_model(MODEL_PATH)
+# Load the trained recog_model
+recog_model_path = 'sign_client\model.h5'
+recog_model = load_model(recog_model_path)
 
 # Image Preprocessing Functions
 def grayscale(img):
@@ -61,12 +62,12 @@ def predict_sign(image_path):
         return
 
     # Preprocess the image
-    img = cv2.resize(imgOriginal, (32, 32))  # Resize to the input size of the model
+    img = cv2.resize(imgOriginal, (32, 32))  # Resize to the input size of the recog_model
     img = preprocessing(img)
     img = img.reshape(1, 32, 32, 1)
 
     # Predict the class
-    predictions = model.predict(img)
+    predictions = recog_model.predict(img)
     classIndex = np.argmax(predictions, axis=-1)[0]
     probabilityValue = np.max(predictions)
 
@@ -99,13 +100,14 @@ def Sending(s, message):
 
 # Main code
 if __name__ == "__main__" :
-    image_path = "D:/Engineering/College/4th_Year/GP/Sign_Recognition/Code/My_Code/Dataset/10/10_17134_1577672005.5387852.png"
+    # image_path = "D:/Engineering/College/4th_Year/GP/Sign_Recognition/Code/My_Code/Dataset/10/10_17134_1577672005.5387852.png"
+    image_folder = Path("sign_client\output_images")
     # Establish a socket object
     SOCKET = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
     client_connect(SOCKET)
     try:
-        for i in range(5):
-            message = "Sign Type is: " + predict_sign(image_path)
+        for image_path in image_folder.glob("*"):
+            message = "Sign Type is: " + predict_sign(str(image_path))
             try:
                 Sending(SOCKET, message)
             except KeyboardInterrupt:
