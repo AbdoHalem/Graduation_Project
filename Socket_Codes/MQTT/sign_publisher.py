@@ -87,7 +87,7 @@ if __name__ == "__main__" :
     image_folder = Path("sign_client\output_images")
     # Select the mqtt server and its topic
     MQTT_SERVER = "test.mosquitto.org"
-    MQTT_PATH = "test/topic"
+    MQTT_PATH = "test/topic1"
     try:
         for image_path in image_folder.glob("*"):
             message = "Sign Type is: " + predict_sign(str(image_path))
