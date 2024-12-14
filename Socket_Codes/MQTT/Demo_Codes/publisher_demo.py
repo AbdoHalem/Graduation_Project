@@ -1,7 +1,7 @@
 import paho.mqtt.publish as publish
 
 MQTT_SERVER = "test.mosquitto.org"
-MQTT_PATH = "test/topic1"
+MQTT_PATH = "ADAS_GP/sign"
 
 
 

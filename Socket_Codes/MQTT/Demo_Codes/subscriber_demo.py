@@ -3,7 +3,7 @@ import paho.mqtt.client as mqtt
 # MQTT settings
 broker = "test.mosquitto.org"
 port = 1883
-topic = "test/topic"
+topic = "ADAS_GP/sign"
 
 # Define the callback functions
 def on_connect(client, userdata, flags, rc):
