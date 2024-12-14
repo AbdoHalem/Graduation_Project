@@ -4,7 +4,7 @@ import threading
 # MQTT settings
 broker = "test.mosquitto.org"
 port = 1883
-topics = ["test/topic1", "test/topic2"]
+topics = ["ADAS_GP/sign", "ADAS_GP/drowsiness"]
 
 # Define the callback functions
 def on_connect(client, userdata, flags, rc):
@@ -14,11 +14,11 @@ def on_connect(client, userdata, flags, rc):
     print("Subscribed to topics:", topics)
 
 def process_topic(client, userdata, topic):
-    while True:
-        if topic in userdata["messages"]:
+    while not userdata["stop"]:
+        if topic in userdata["messages"] and userdata["messages"][topic] is not None:
             message = userdata["messages"].pop(topic)
-            print(f"Thread for {topic}: {message}")
             if message == "close":
+                userdata["stop"] = True
                 client.loop_stop()
                 client.disconnect()
                 break
@@ -26,13 +26,14 @@ def process_topic(client, userdata, topic):
 def on_message(client, userdata, msg):
     topic = msg.topic
     message = msg.payload.decode()
-    print(f"Message received on {topic}: {message}")
-    if topic in userdata["messages"]:
-        userdata["messages"][topic] = message
+    print(f"{topic} => {message}")
+    userdata["messages"][topic] = message
 
-
-# Userdata to hold messages for each topic
-userdata = {"messages": {topic: None for topic in topics}}
+# Userdata to hold messages and stop signal
+userdata = {
+    "messages": {topic: None for topic in topics},
+    "stop": False
+}
 
 # Create an MQTT client
 client = mqtt.Client(userdata=userdata)
