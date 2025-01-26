@@ -8,7 +8,7 @@ import socket
 # from threading import Thread
 
 # Load the trained recog_model
-recog_model_path = 'sign_client\model.h5'
+recog_model_path = 'sign_client\\recognition_model\\recog_model.h5'
 recog_model = load_model(recog_model_path)
 
 # Image Preprocessing Functions

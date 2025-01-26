@@ -169,14 +169,15 @@ if __name__ == "__main__" :
     client_connect(SOCKET)
 
     # Load the trained recog_model
-    recog_model_path = 'sign_client\model.h5'
+    recog_model_path = r'sign_client\\recognition_model\\recog_model.h5'
+    print(os.path.abspath(recog_model_path))    # For testing only
     recog_model = load_model(recog_model_path)
 
     # Get the detection model and video paths
     root = os.getcwd()
-    detection_model_path = r'sign_client\detection_model\best.pt'
+    detection_model_path = r'sign_client\\detection_model\\best.pt'
     input_type = 'video'                                    # Change to 'image' or 'camera' as needed
-    input_source = r'sign_client\test_videos\video2.mp4'    # Required for 'video' or 'image'
+    input_source = r'sign_client\\test_videos\\video2.mp4'    # Required for 'video' or 'image'
     counter = 0
 
     # Initialize model and input source
