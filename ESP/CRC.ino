@@ -1,5 +1,5 @@
+#include <Arduino.h>
 
-// this crc polynomial is like it "that is for example .. "
 const uint16_t crc_polynomial = 0x8008;
 
 uint16_t calculateCRC(const uint8_t* data, size_t length) {
@@ -22,26 +22,27 @@ uint16_t calculateCRC(const uint8_t* data, size_t length) {
 
 void setup() {
     Serial.begin(9600);
-    
-       // set your protocol and recieve the data form the protocol .. 
+   
     
 
-      // i simulate the recieved data .. using this array  
+    // Simulated received data
     uint8_t data[] = {0x12, 0x34, 0x56, 0x78};
-
-    
     uint16_t crcChecksum = calculateCRC(data, sizeof(data));
-     // make a comperison between the original data and crc output .. 
+
+    // Print Data
     Serial.print("Data: ");
     for (size_t i = 0; i < sizeof(data); ++i) {
         Serial.print(data[i], HEX);
         Serial.print(" ");
     }
+    // Print CRC
     Serial.print("\nCRC Checksum: 0x");
     Serial.println(crcChecksum, HEX);
 
+    
+    Serial.write((uint8_t*)&crcChecksum, sizeof(crcChecksum)); 
 }
 
 void loop() {
-    
+  
 }
