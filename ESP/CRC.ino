@@ -39,7 +39,7 @@ void setup() {
     Serial.print("\nCRC Checksum: 0x");
     Serial.println(crcChecksum, HEX);
 
-    
+    Serial.write(data, sizeof(data));
     Serial.write((uint8_t*)&crcChecksum, sizeof(crcChecksum)); 
 }
 
