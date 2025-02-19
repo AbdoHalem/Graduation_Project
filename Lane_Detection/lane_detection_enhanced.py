@@ -52,7 +52,7 @@ kalman.measurementNoiseCov = np.array([[1e-1]], np.float32) # Measurement noise 
 kalman.errorCovPost = np.array([[1]], np.float32)           # Initial estimation error
 
 # --- Setup Video Capture and Create Trackbar for Threshold ---
-cap = cv2.VideoCapture('car1.mp4')
+cap = cv2.VideoCapture('Car1.mp4')
 
 # Create (or re-use) the display window and attach a trackbar for threshold adjustment.
 cv2.namedWindow('Lane Detection - Combined View')
