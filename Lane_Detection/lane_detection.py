@@ -90,7 +90,7 @@ def resize_image(image, width, height):
     return cv2.resize(image, (width, height))
 
 # Load the video
-cap = cv2.VideoCapture('car0.mp4')
+cap = cv2.VideoCapture('Car0.mp4')
 
 # Loop over the video frames
 while cap.isOpened():
