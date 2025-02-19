@@ -149,7 +149,7 @@ while cap.isOpened():
             status_filtered = "On Lane - filtered"
         else:
             status_filtered = "Off Lane - filtered"
-    cv2.putText(frame, status_filtered, (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+        cv2.putText(frame, status_filtered, (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
     
     # Determine lane status based on unfiltered deviation
     status_unfiltered = "Unknown"
@@ -158,7 +158,7 @@ while cap.isOpened():
             status_unfiltered = "On Lane - NOT filtered"
         else:
             status_unfiltered = "Off Lane - NOT filtered"
-    cv2.putText(frame, status_unfiltered, (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+        cv2.putText(frame, status_unfiltered, (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
     
     # --- Create Slider Overlay ---
     # Parameters for slider overlay
