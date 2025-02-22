@@ -1,0 +1,15 @@
+enc28j60.c:21:16:spiTransfer	32	static
+enc28j60.c:27:16:enc28j60ReadOp	24	static
+enc28j60.c:38:13:enc28j60WriteOp	16	static
+enc28j60.c:45:13:enc28j60SetBank	16	static
+enc28j60.c:53:13:enc28j60Write	16	static
+enc28j60.c:58:16:enc28j60Read	16	static
+enc28j60.c:63:6:enc28j60Init	16	static
+enc28j60.c:95:6:enc28j60clkout	16	static
+enc28j60.c:99:6:enc28j60SetIP	16	static
+enc28j60.c:103:9:enc28j60linkup	8	static
+enc28j60.c:107:6:enc28j60PhyWrite	16	static
+enc28j60.c:114:10:enc28j60PhyRead	24	static
+enc28j60.c:122:6:enc28j60PacketSend	24	static
+enc28j60.c:139:6:enc28j60MakeUDPheader	32	static
+enc28j60.c:163:6:enc28j60PacketSendUDP	744	static

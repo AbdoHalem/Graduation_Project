@@ -1,0 +1,11 @@
+freertos.c:104:6:vApplicationGetIdleTaskMemory	24	static
+freertos.c:118:6:MX_FREERTOS_Init	248	static
+freertos.c:184:6:StartDefaultTask	16	static
+freertos.c:202:6:UltrasonicTask	16	static
+freertos.c:232:6:ProcessDistance	16	static
+freertos.c:263:6:ProximityAction	16	static
+freertos.c:280:6:UART1_Task	24	static
+freertos.c:295:6:Motor_Task	24	static
+freertos.c:324:6:makeSomeIpMessage	32	static
+freertos.c:354:6:EthernetTask	16	static
+freertos.c:373:6:SomeIpTask	88	static
