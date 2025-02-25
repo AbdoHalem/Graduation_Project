@@ -188,7 +188,7 @@ def road_lines_status(image, update_model=True):
         status = 1 if abs(filtered_deviation) < threshold else 0
     else:
         # If no lane is detected, consider the status as off lane (0)
-        status = 0
+        status = 2
 
     return status
 
