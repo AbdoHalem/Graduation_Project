@@ -87,11 +87,17 @@ if __name__ == "__main__" :
     # Select the mqtt server and its topic
     MQTT_SERVER = "test.mosquitto.org"
     MQTT_PATH = "ADAS_GP/sign"
+    # Save the last message to prevent resending of the same message
+    last_message = None
     try:
         for image_path in image_folder.glob("*"):
             message = "Sign Type is: " + predict_sign(str(image_path))
             try:
-                publish.single(MQTT_PATH, message, hostname=MQTT_SERVER)
+                if(message != last_message):
+                    publish.single(MQTT_PATH, message, hostname=MQTT_SERVER)
+                else:
+                    continue
+                last_message = message
             except KeyboardInterrupt:
                 print("\nShutting down the client.")
                 break
