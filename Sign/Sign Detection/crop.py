@@ -1,6 +1,11 @@
 import cv2
 import os
 from ultralytics import YOLO
+import numpy
+import sys
+# Ensure the expected module is available in sys.modules:
+sys.modules['numpy._core.multiarray'] = numpy.core.multiarray
+
 
 def initialize_model_and_source(model_path, input_type, input_source=None):
     """
@@ -73,7 +78,7 @@ if __name__ == "__main__":
     root = os.getcwd()
     model_path = r'model\best.pt'
     input_type = 'video'  # Change to 'image' or 'camera' as needed
-    input_source = r'test_videos\video2.mp4'  # Required for 'video' or 'image'
+    input_source = r'test_videos\\video2.mp4'  # Required for 'video' or 'image'
     counter = 0
 
     # Initialize model and input source

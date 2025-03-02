@@ -1,6 +1,10 @@
 import cv2
 import os
 from ultralytics import YOLO
+import numpy
+import sys
+# Ensure the expected module is available in sys.modules:
+sys.modules['numpy._core.multiarray'] = numpy.core.multiarray
 
 def initialize_model_and_source(model_path, input_type, input_source=None):
     """
@@ -66,9 +70,9 @@ def process_frame(model, confidence, frame):
 
 if __name__ == "__main__":
     root = os.getcwd()
-    detection_model_path = r'sign_client\detection_model\best.pt'
-    input_type = 'video'                        # Change to 'image' or 'camera' as needed
-    input_source = r'sign_client\test_videos\video2.mp4'    # Required for 'video' or 'image'
+    detection_model_path = r'detection_model\best.pt'
+    input_type = 'video'                         # Change to 'image' or 'camera' as needed
+    input_source = r'test_videos\\video2.mp4'    # Required for 'video' or 'image'
     counter = 0
 
     # Initialize model and input source

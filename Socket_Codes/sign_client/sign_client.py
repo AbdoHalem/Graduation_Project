@@ -8,7 +8,8 @@ import socket
 # from threading import Thread
 
 # Load the trained recog_model
-recog_model_path = 'sign_client\\recognition_model\\recog_model.h5'
+# recog_model_path = 'sign_client\\recognition_model\\recog_model.h5'
+recog_model_path = r"recognition_model\\model.h5"
 recog_model = load_model(recog_model_path)
 
 # Image Preprocessing Functions
@@ -101,7 +102,7 @@ def Sending(s, message):
 # Main code
 if __name__ == "__main__" :
     # image_path = "D:/Engineering/College/4th_Year/GP/Sign_Recognition/Code/My_Code/Dataset/10/10_17134_1577672005.5387852.png"
-    image_folder = Path("sign_client\output_images")
+    image_folder = Path("output_images")
     # Establish a socket object
     SOCKET = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
     client_connect(SOCKET)

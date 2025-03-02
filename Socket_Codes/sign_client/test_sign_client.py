@@ -5,6 +5,10 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'    # To disaple displaying the tensorfl
 from tensorflow.keras.models import load_model
 import socket
 from ultralytics import YOLO
+import numpy
+import sys
+# Ensure the expected module is available in sys.modules:
+sys.modules['numpy._core.multiarray'] = numpy.core.multiarray
 # Import the detection file
 # import detection as detect
 
@@ -169,15 +173,15 @@ if __name__ == "__main__" :
     client_connect(SOCKET)
 
     # Load the trained recog_model
-    recog_model_path = r'sign_client\\recognition_model\\recog_model.h5'
+    recog_model_path = r'recognition_model\\model.h5'
     print(os.path.abspath(recog_model_path))    # For testing only
     recog_model = load_model(recog_model_path)
 
     # Get the detection model and video paths
     root = os.getcwd()
-    detection_model_path = r'sign_client\\detection_model\\best.pt'
+    detection_model_path = r'detection_model\\best.pt'
     input_type = 'video'                                    # Change to 'image' or 'camera' as needed
-    input_source = r'sign_client\\test_videos\\video2.mp4'    # Required for 'video' or 'image'
+    input_source = r'test_videos\\video2.mp4'               # Required for 'video' or 'image'
     counter = 0
 
     # Initialize model and input source
