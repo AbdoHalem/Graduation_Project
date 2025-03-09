@@ -7,7 +7,7 @@ void setup() {
   
   Serial.begin(9600);
   
-  Serial.println("ESP32 جاهز لاستقبال الـ Frame");
+  Serial.println("Frame is ready");
 }
 
 void loop() {
