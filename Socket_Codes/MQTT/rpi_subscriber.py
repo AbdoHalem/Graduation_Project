@@ -4,7 +4,7 @@ import threading
 # MQTT settings
 broker = "test.mosquitto.org"
 port = 1883
-topics = ["ADAS_GP/sign", "ADAS_GP/drowsiness"]
+topics = ["ADAS_GP/sign", "ADAS_GP/drowsiness", "ADAS_GP/lane"]
 
 # Define the callback functions
 def on_connect(client, userdata, flags, rc):
@@ -61,8 +61,8 @@ try:
 except KeyboardInterrupt:
     print("\nKeyboardInterrupt detected, stopping...")
     userdata["stop"] = True
-    client.loop_stop()  # Stop the MQTT loop
-    client.disconnect()  # Disconnect from broker
+    client.loop_stop()      # Stop the MQTT loop
+    client.disconnect()     # Disconnect from broker
     for thread in threads:
         thread.join()  # Wait for all threads to finish
 
