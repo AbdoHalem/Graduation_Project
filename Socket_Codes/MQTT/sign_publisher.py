@@ -1,11 +1,86 @@
 import os
 import numpy as np
 import cv2
-from pathlib import Path
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'        # To disaple displaying the tensorflow logs
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'    # To disaple displaying the tensorflow logs
 from tensorflow.keras.models import load_model
 import paho.mqtt.publish as publish
+from ultralytics import YOLO
+import numpy
+import sys
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"  # Disable GPU
+# Ensure the expected module is available in sys.modules:
+sys.modules['numpy._core.multiarray'] = numpy.core.multiarray
 
+# MQTT Configuration
+MQTT_BROKER = "test.mosquitto.org"
+MQTT_PORT = 1883
+MQTT_TOPIC = "ADAS_GP/sign"
+
+'''################# Detection Functions #################'''
+def initialize_model_and_source(model_path, input_type, input_source=None):
+    """
+    Initialize the YOLO model and input source.
+    Args:
+        model_path (str): Relative path to the YOLO model file (.pt).
+        input_type (str): Type of input source ('video', 'image', 'camera').
+        input_source (str or None): Relative path to the input file or folder (for 'video' or 'image').
+    Returns:
+        model: Loaded YOLO model.
+        cap: VideoCapture object for video or camera inputs, or None for image input.
+        input_images (list): List of image paths if input_type is 'image', otherwise None.
+    """
+    root = os.getcwd()
+    model_path = os.path.join(root, model_path)
+    input_source = os.path.join(root, input_source) if input_source else None
+    model = YOLO(model_path)
+    cap = None
+    input_images = None
+
+    if input_type == 'video':
+        cap = cv2.VideoCapture(input_source)
+    elif input_type == 'camera':
+        cap = cv2.VideoCapture(0)  # Default to the first connected camera
+    elif input_type == 'image':
+        if os.path.isdir(input_source):
+            input_images = [os.path.join(input_source, f) for f in os.listdir(input_source)
+                            if f.lower().endswith(('.jpg', '.jpeg', '.png'))]
+        else:
+            raise ValueError("Input source must be a valid directory for images.")
+    else:
+        raise ValueError("Invalid input type. Choose 'video', 'image', or 'camera'.")
+
+    return model, cap, input_images
+
+def process_frame(model, confidence, frame):
+    """
+    Process a single frame using the YOLO model.
+    Args:
+        model: YOLO model instance.
+        confidence (float): Confidence threshold for object detection.
+        frame: A single video frame or image.
+    Returns:
+        annotated_frame: Frame with annotations.
+        list: List of cropped images (regions of detected objects).
+    """
+    cropped_images = []
+
+    # Perform inference on the current frame
+    results = model(frame, conf=confidence)
+
+    # Visualize the results on the frame
+    annotated_frame = results[0].plot()
+
+    # Extract bounding boxes and crop regions
+    boxes = results[0].boxes.xyxy  # Bounding boxes (x1, y1, x2, y2)
+    for box in boxes:
+        x1, y1, x2, y2 = map(int, box[:4])
+        cropped_region = frame[y1:y2, x1:x2]
+        cropped_images.append(cropped_region)
+
+    return annotated_frame, cropped_images
+'''#########################################################'''
+
+'''################# Recognition Functions #################'''
 # Image Preprocessing Functions
 def grayscale(img):
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -21,7 +96,7 @@ def preprocessing(img):
     img = img / 255  # Normalize the image
     return img
 
-# Function to get the label of ths input sign
+'''Function to get the label of ths input sign'''
 def getClassName(classNo):
     class_names = [
         'Speed Limit 20 km/h', 'Speed Limit 30 km/h', 'Speed Limit 50 km/h',
@@ -49,15 +124,14 @@ def getClassName(classNo):
     ]
     return class_names[classNo] if classNo < len(class_names) else "Unknown"
 
-def predict_sign(image_path):
-    # Read and preprocess the image
-    imgOriginal = cv2.imread(image_path)
-    if imgOriginal is None:
-        print(f"Error: Unable to read image from path: {image_path}")
-        return
+'''Function to predict the sign type'''
+def predict_sign(cropped_image):
+    if cropped_image is None or cropped_image.size == 0:
+        print("Error: Cropped image is empty.")
+        return "Unknown Sign"
 
     # Preprocess the image
-    img = cv2.resize(imgOriginal, (32, 32))  # Resize to the input size of the recog_model
+    img = cv2.resize(cropped_image, (32, 32))  # Resize to the input size of the recog_model
     img = preprocessing(img)
     img = img.reshape(1, 32, 32, 1)
 
@@ -74,34 +148,122 @@ def predict_sign(image_path):
     else:
         print("No sign detected")
         return "Unknown Sign"
+'''#########################################################'''
 
+# '''#################### MQTT Functions #####################'''
+# def on_connect(client, userdata, flags, rc):
+#     if rc == 0:
+#         print("Connected to MQTT Broker!")
+#     else:
+#         print(f"Failed to connect, return code {rc}\n")
 
-# Load the trained recog_model
-recog_model_path = r"model.h5"
-print(os.path.exists(recog_model_path))
-recog_model = load_model(recog_model_path)
+# def setup_mqtt():
+#     client = mqtt.Client()
+#     client.on_connect = on_connect
+#     client.connect(MQTT_BROKER, MQTT_PORT)
+#     client.loop_start()
+#     return client
 
-# Main code
+# def send_mqtt(client, message):
+#     try:
+#         result = client.publish(MQTT_TOPIC, message, hostname=MQTT_BROKER)
+#         if result.rc != mqtt.MQTT_ERR_SUCCESS:
+#             print(f"MQTT publish error: {mqtt.error_string(result.rc)}")
+#     except Exception as e:
+#         print(f"Error sending MQTT message: {e}")
+# '''#########################################################'''
+
+''' Main Code '''
 if __name__ == "__main__" :
-    image_folder = Path("D:\Engineering\My-Github\Graduation_Project\Socket_Codes\sign_client\output_images")
-    # Select the mqtt server and its topic
-    MQTT_SERVER = "test.mosquitto.org"
-    MQTT_PATH = "ADAS_GP/sign"
-    # Save the last message to prevent resending of the same message
-    last_message = None
-    try:
-        for image_path in image_folder.glob("*"):
-            message = "Sign Type is: " + predict_sign(str(image_path))
-            try:
-                if(message != last_message):
-                    publish.single(MQTT_PATH, message, hostname=MQTT_SERVER)
-                else:
-                    continue
-                last_message = message
-            except KeyboardInterrupt:
-                print("\nShutting down the client.")
-                break
-    finally:
-        print("Publisher Close")
-        
+    # Initialize MQTT client
+    # mqtt_client = setup_mqtt()
 
+    # Load the trained recog_model
+    # recog_model_path = r'recognition_model\\model.h5'       # for windows
+    recog_model_path = r'recognition_model/model.h5'          # for linux
+    # print(os.path.abspath(recog_model_path))                # for testing only
+    recog_model = load_model(recog_model_path)
+
+    # Get the detection model and video paths
+    root = os.getcwd()
+    # detection_model_path = r'detection_model\\best.pt'    # for windows
+    detection_model_path = r'detection_model/best.pt'       # for linux
+    input_type = 'video'                                    # Change to 'image' or 'camera' as needed
+    # input_source = r'test_videos\\video2.mp4'             # Required for 'video' or 'image'
+    input_source = r'test_videos/video2.mp4'                # Required for 'video' or 'image' (for linux)
+
+    # Initialize model and input source
+    detection_model, cap, input_images = initialize_model_and_source(detection_model_path, input_type, input_source)
+    confidence_threshold = 0.34
+
+    # New variables for frame skipping and duplicate detection
+    frame_interval = 5         # Process every 10th frame
+    last_sign = None            # Track last sent sign
+    frame_counter = 0           # Count processed frames
+
+    try:
+        if input_type in ['video', 'camera']:
+            if not cap.isOpened():
+                print("Error: Unable to open the input source.")
+            else:
+                while cap.isOpened():
+                    ret, frame = cap.read()
+                    if not ret:
+                        break
+
+                    frame_counter += 1
+                    # Only process every 10th frame
+                    if frame_counter % frame_interval != 0:
+                        continue
+
+                    # Process the frame and get the cropped signs
+                    _, cropped_signs = process_frame(detection_model, confidence_threshold, frame)
+                    # Predict the sign type of each crop
+                    for cropped_image in cropped_signs:
+                        if cropped_image.size == 0:
+                            continue  # Skip empty crops
+
+                        # Get current sign prediction
+                        current_sign = predict_sign(cropped_image)
+                        # Only send if sign is different from previous
+                        if current_sign != last_sign:                            
+                            message = f"Sign Type is: {current_sign}"
+                            try:
+                                # send_mqtt(mqtt_client, message)
+                                publish.single(MQTT_TOPIC, message, hostname=MQTT_BROKER)
+                                last_sign = current_sign       # Update last sent sign
+                            except KeyboardInterrupt:
+                                print("\nShutting down the publisher.")
+                cap.release()
+        
+        elif input_type == 'image':
+            if not input_images:
+                print("Error: No images found in the specified directory.")
+            else:
+                for image_path in input_images:
+                    frame = cv2.imread(image_path)
+                    # Process the image
+                    _, cropped_signs = process_frame(detection_model, confidence_threshold, frame)
+                    # Predict the sign type of each image
+                    for cropped_image in cropped_signs:
+                        if cropped_image.size == 0:
+                            continue
+
+                        # Get current sign prediction
+                        current_sign = predict_sign(cropped_image)
+                        # Only send if sign is different from previous
+                        if current_sign != last_sign:
+                            message = f"Sign Type is: {current_sign}"
+                            try:
+                                # send_mqtt(mqtt_client, message)
+                                publish.single(MQTT_TOPIC, message, hostname=MQTT_BROKER)
+                                last_sign = current_sign        # Update last sent sign
+                            except KeyboardInterrupt:
+                                print("\nShutting down the client.")
+
+    except KeyboardInterrupt:
+        print("\nShutting down the client.")
+    finally:
+        print("Publisher closed.")
+        # mqtt_client.loop_stop()
+        # mqtt_client.disconnect()
