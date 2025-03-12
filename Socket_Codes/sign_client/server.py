@@ -20,7 +20,8 @@ def Receiving(client_socket, stop_flag):
 
 # Create and bind socket
 SOCKET = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-device_name = "Halem-Lab"
+# device_name = "Halem-Lab"
+device_name = "abdohalem"
 server_ip = socket.gethostbyname(device_name)
 port = 1234
 SOCKET.bind((server_ip, port))
