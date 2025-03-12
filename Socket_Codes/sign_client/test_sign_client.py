@@ -7,6 +7,7 @@ import socket
 from ultralytics import YOLO
 import numpy
 import sys
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"  # Disable GPU
 # Ensure the expected module is available in sys.modules:
 sys.modules['numpy._core.multiarray'] = numpy.core.multiarray
 # Import the detection file
@@ -120,15 +121,18 @@ def getClassName(classNo):
     ]
     return class_names[classNo] if classNo < len(class_names) else "Unknown"
 
-def predict_sign(image_path):
+def predict_sign(cropped_image):
     # Read and preprocess the image
-    imgOriginal = cv2.imread(image_path)
-    if imgOriginal is None:
-        print(f"Error: Unable to read image from path: {image_path}")
-        return
+    # imgOriginal = cv2.imread(image_path)
+    # if imgOriginal is None:
+    #     print(f"Error: Unable to read image from path: {image_path}")
+    #     return
+    if cropped_image is None or cropped_image.size == 0:
+        print("Error: Cropped image is empty.")
+        return "Unknown Sign"
 
     # Preprocess the image
-    img = cv2.resize(imgOriginal, (32, 32))  # Resize to the input size of the recog_model
+    img = cv2.resize(cropped_image, (32, 32))  # Resize to the input size of the recog_model
     img = preprocessing(img)
     img = img.reshape(1, 32, 32, 1)
 
@@ -149,7 +153,8 @@ def predict_sign(image_path):
 
 # Function to establish a socket connection between client and server
 def client_connect(SOCKET):
-    server_IP = socket.gethostbyname("Halem-Lab")
+    # server_IP = socket.gethostbyname("Halem-Lab")
+    server_IP = socket.gethostbyname("abdohalem")
     port = 1234
     SOCKET.connect((server_IP, port))
     print("Connected to server.")
@@ -173,15 +178,18 @@ if __name__ == "__main__" :
     client_connect(SOCKET)
 
     # Load the trained recog_model
-    recog_model_path = r'recognition_model\\model.h5'
+    # recog_model_path = r'recognition_model\\model.h5'       #for windows
+    recog_model_path = r'recognition_model/model.h5'       # for linux
     print(os.path.abspath(recog_model_path))    # For testing only
     recog_model = load_model(recog_model_path)
 
     # Get the detection model and video paths
     root = os.getcwd()
-    detection_model_path = r'detection_model\\best.pt'
+    # detection_model_path = r'detection_model\\best.pt'    # for windows
+    detection_model_path = r'detection_model/best.pt'    # for linux
     input_type = 'video'                                    # Change to 'image' or 'camera' as needed
-    input_source = r'test_videos\\video2.mp4'               # Required for 'video' or 'image'
+    # input_source = r'test_videos\\video2.mp4'               # Required for 'video' or 'image'
+    input_source = r'test_videos/video2.mp4'               # Required for 'video' or 'image' (for linux)
     counter = 0
 
     # Initialize model and input source
@@ -201,7 +209,13 @@ if __name__ == "__main__" :
                     _, cropped_regions = process_frame(detection_model, confidence_threshold, frame)
                     # Predict the sign type of each crop
                     for cropped_image in cropped_regions:
+                        if cropped_image.size == 0:
+                            continue  # Skip empty crops
                         message = "Sign Type is: " + predict_sign(cropped_image)
+                        try:
+                            Sending(SOCKET, message)
+                        except KeyboardInterrupt:
+                            print("\nShutting down the client.")
 
                 cap.release()
 
@@ -216,11 +230,12 @@ if __name__ == "__main__" :
                     # # Predict the sign type of each image
                     for cropped_image in cropped_regions:
                         message = "Sign Type is: " + predict_sign(cropped_image)
+                        try:
+                            Sending(SOCKET, message)
+                        except KeyboardInterrupt:
+                            print("\nShutting down the client.")
 
-        message = "Sign Type is: " + predict_sign(str(image_path))
-        try:
-            Sending(SOCKET, message)
-        except KeyboardInterrupt:
-            print("\nShutting down the client.")
+    except KeyboardInterrupt:
+        print("\nShutting down the client.")
     finally:
         SOCKET.close()
