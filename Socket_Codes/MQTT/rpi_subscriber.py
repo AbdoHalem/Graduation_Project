@@ -36,7 +36,7 @@ userdata = {
 }
 
 # Create an MQTT client
-client = mqtt.Client(userdata=userdata)
+client = mqtt.Client(userdata=userdata, protocol=mqtt.MQTTv311)
 
 # Assign callback functions
 client.on_connect = on_connect
