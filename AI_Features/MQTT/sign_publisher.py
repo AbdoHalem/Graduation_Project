@@ -99,28 +99,54 @@ def preprocessing(img):
 '''Function to get the label of ths input sign'''
 def getClassName(classNo):
     class_names = [
-        'Speed Limit 20 km/h', 'Speed Limit 30 km/h', 'Speed Limit 50 km/h',
-        'Speed Limit 60 km/h', 'Speed Limit 70 km/h', 'Speed Limit 80 km/h',
-        'End of Speed Limit 80 km/h', 'Speed Limit 100 km/h', 
-        'Speed Limit 120 km/h', 'No passing', 
-        'No passing for vehicles over 3.5 metric tons', 
-        'Right-of-way at the next intersection', 'Priority road', 
-        'Yield', 'Stop', 'No vehicles', 
-        'Vehicles over 3.5 metric tons prohibited', 'No entry', 
-        'General caution', 'Dangerous curve to the left', 
-        'Dangerous curve to the right', 'Double curve', 
-        'Bumpy road', 'Slippery road', 
-        'Road narrows on the right', 'Road work', 
-        'Traffic signals', 'Pedestrians', 
-        'Children crossing', 'Bicycles crossing', 
-        'Beware of ice/snow', 'Wild animals crossing', 
-        'End of all speed and passing limits', 
-        'Turn right ahead', 'Turn left ahead', 
-        'Ahead only', 'Go straight or right', 
-        'Go straight or left', 'Keep right', 
-        'Keep left', 'Roundabout mandatory', 
-        'End of no passing', 
-        'End of no passing by vehicles over 3.5 metric tons'
+    "Speed limit (20km/h)",
+    "Speed limit (30km/h)",
+    "Speed limit (50km/h)",
+    "Speed limit (60km/h)",
+    "Speed limit (70km/h)",
+    "Speed limit (80km/h)",
+    "End of speed limit (80km/h)",
+    "Speed limit (100km/h)",
+    "Speed limit (120km/h)",
+    "No passing",
+    "No passing for vehicles over 3.5 metric tons",
+    "Right-of-way at the next intersection",
+    "Priority road",
+    "Yield",
+    "Stop",
+    "No vehicles",
+    "Vehicles over 3.5 metric tons prohibited",
+    "No entry",
+    "General caution",
+    "Dangerous curve to the left",
+    "Dangerous curve to the right",
+    "Double curve",
+    "Bumpy road",
+    "Slippery road",
+    "Road narrows on the right",
+    "Road work",
+    "Traffic signals",
+    "Pedestrians",
+    "Children crossing",
+    "Bicycles crossing",
+    "Beware of ice/snow",
+    "Wild animals crossing",
+    "End of all speed and passing limits",
+    "Turn right ahead",
+    "Turn left ahead",
+    "Ahead only",
+    "Go straight or right",
+    "Go straight or left",
+    "Keep right",
+    "Keep left",
+    "Roundabout mandatory",
+    "End of no passing",
+    "End of no passing by vehicles over 3.5 metric tons",
+    "Speed limit (40km/h)",
+    "Speed limit (90km/h)",
+    "No stopping",
+    "No horn",
+    "No passing"
     ]
     return class_names[classNo] if classNo < len(class_names) else "Unknown"
 
@@ -180,7 +206,7 @@ if __name__ == "__main__" :
 
     # Load the trained recog_model
     # recog_model_path = r'recognition_model\\model.h5'       # for windows
-    recog_model_path = r'recognition_model/model.h5'          # for linux
+    recog_model_path = r'recognition_model/model_v2.h5'          # for linux
     # print(os.path.abspath(recog_model_path))                # for testing only
     recog_model = load_model(recog_model_path)
 
