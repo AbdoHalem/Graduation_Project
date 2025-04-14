@@ -167,7 +167,7 @@ def predict_sign(cropped_image):
     probabilityValue = np.max(predictions)
 
     # Print the result
-    if probabilityValue > 0.75:  # You can adjust this threshold
+    if probabilityValue > 0.9:  # You can adjust this threshold
         className = getClassName(classIndex)
         print(f"Sign Type is: {className}")
         return className
