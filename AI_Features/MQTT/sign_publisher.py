@@ -1,13 +1,13 @@
 import os
 import numpy as np
 import cv2
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'    # To disaple displaying the tensorflow logs
 from tensorflow.keras.models import load_model
 import paho.mqtt.publish as publish
 from ultralytics import YOLO
 import numpy
 import sys
-os.environ["CUDA_VISIBLE_DEVICES"] = "-1"  # Disable GPU
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'    # To disaple displaying the tensorflow logs
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"   # Disable GPU
 # Ensure the expected module is available in sys.modules:
 sys.modules['numpy._core.multiarray'] = numpy.core.multiarray
 
@@ -176,37 +176,11 @@ def predict_sign(cropped_image):
         return "Unknown Sign"
 '''#########################################################'''
 
-# '''#################### MQTT Functions #####################'''
-# def on_connect(client, userdata, flags, rc):
-#     if rc == 0:
-#         print("Connected to MQTT Broker!")
-#     else:
-#         print(f"Failed to connect, return code {rc}\n")
-
-# def setup_mqtt():
-#     client = mqtt.Client()
-#     client.on_connect = on_connect
-#     client.connect(MQTT_BROKER, MQTT_PORT)
-#     client.loop_start()
-#     return client
-
-# def send_mqtt(client, message):
-#     try:
-#         result = client.publish(MQTT_TOPIC, message, hostname=MQTT_BROKER)
-#         if result.rc != mqtt.MQTT_ERR_SUCCESS:
-#             print(f"MQTT publish error: {mqtt.error_string(result.rc)}")
-#     except Exception as e:
-#         print(f"Error sending MQTT message: {e}")
-# '''#########################################################'''
-
 ''' Main Code '''
 if __name__ == "__main__" :
-    # Initialize MQTT client
-    # mqtt_client = setup_mqtt()
-
     # Load the trained recog_model
     # recog_model_path = r'recognition_model\\model.h5'       # for windows
-    recog_model_path = r'recognition_model/model_v2.keras'          # for linux
+    recog_model_path = r'recognition_model/model_v2.h5'       # for linux
     # print(os.path.abspath(recog_model_path))                # for testing only
     recog_model = load_model(recog_model_path)
 
@@ -223,7 +197,7 @@ if __name__ == "__main__" :
     confidence_threshold = 0.34
 
     # New variables for frame skipping and duplicate detection
-    frame_interval = 5         # Process every 10th frame
+    frame_interval = 5          # Process every 10th frame
     last_sign = None            # Track last sent sign
     frame_counter = 0           # Count processed frames
 
@@ -291,5 +265,3 @@ if __name__ == "__main__" :
         print("\nShutting down the client.")
     finally:
         print("Publisher closed.")
-        # mqtt_client.loop_stop()
-        # mqtt_client.disconnect()
