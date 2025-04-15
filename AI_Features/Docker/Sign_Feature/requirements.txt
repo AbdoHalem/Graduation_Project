@@ -1,0 +1,6 @@
+ultralytics==8.3.78
+keras==3.9.0
+paho-mqtt==2.1.0
+tflite-runtime==2.13.0
+opencv-python
+scipy==1.15.2
