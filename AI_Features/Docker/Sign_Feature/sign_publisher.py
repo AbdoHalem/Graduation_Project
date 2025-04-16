@@ -8,7 +8,7 @@ from ultralytics import YOLO
 import numpy
 import sys
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'    # To disaple displaying the tensorflow logs
-os.environ["CUDA_VISIBLE_DEVICES"] = "-1"  # Disable GPU
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"   # Disable GPU
 # Ensure the expected module is available in sys.modules:
 sys.modules['numpy._core.multiarray'] = numpy.core.multiarray
 
