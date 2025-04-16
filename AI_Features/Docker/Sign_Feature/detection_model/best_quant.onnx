@@ -41022,7 +41022,7 @@ $/model.21/m.0/cv2/conv/Conv_output_0
 onnx.inferonnxruntime.quantr_
 descriptionPUltralytics best model trained on /run/media/omar/Windows-SSD/DATA_SET/data.yamlr
 authorUltralyticsr"
-date2025-04-15T00:30:09.669701r
+date2025-04-16T04:34:40.581985r
 version8.3.78r=
 license2AGPL-3.0 License (https://ultralytics.com/license)r$
 docshttps://docs.ultralytics.comr
