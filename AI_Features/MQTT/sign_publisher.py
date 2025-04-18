@@ -180,7 +180,7 @@ def predict_sign(cropped_image):
 if __name__ == "__main__" :
     # Load the trained recog_model
     # recog_model_path = r'recognition_model\\model.h5'       # for windows
-    recog_model_path = r'recognition_model/model_V3.h5'       # for linux
+    recog_model_path = r'recognition_model/model_v3.h5'       # for linux
     # print(os.path.abspath(recog_model_path))                # for testing only
     recog_model = load_model(recog_model_path)
 
