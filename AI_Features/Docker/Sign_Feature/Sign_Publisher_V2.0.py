@@ -2,7 +2,7 @@ import os
 import numpy as np
 import cv2
 import tflite_runtime.interpreter as tflite
-import paho.mqtt.publish as publish
+import paho.mqtt.client as mqtt
 import onnxruntime
 import sys
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'    # To disaple displaying the tensorflow logs
@@ -14,6 +14,11 @@ sys.modules['np._core.multiarray'] = np.core.multiarray
 MQTT_BROKER = "test.mosquitto.org"
 MQTT_PORT = 1883
 MQTT_TOPIC = "ADAS_GP/sign"
+
+# 1️⃣ Initialize a persistent MQTT client
+mqtt_client = mqtt.Client()
+mqtt_client.connect(MQTT_BROKER, MQTT_PORT, keepalive=60)
+mqtt_client.loop_start()
 
 '''################# Detection Functions #################'''
 def initialize_model_and_source(model_path, input_type, input_source=None):
@@ -238,7 +243,7 @@ def predict_sign(cropped_image):
 ''' Main Code '''
 if __name__ == "__main__" :
     # Load the trained recog_model
-    recog_model_path = r'sign_model.tflite'       # for linux
+    recog_model_path = r'recognition_model/sign_model.tflite'       # for linux
     # Create the TFLite interpreter and allocate tensors
     interpreter = tflite.Interpreter(model_path=recog_model_path)
     interpreter.allocate_tensors()
@@ -277,10 +282,10 @@ if __name__ == "__main__" :
 
                     # Process the frame and get the cropped signs
                     annotated_frame, cropped_signs = process_frame(detection_model, confidence_threshold, frame)
-                    # # Add debug display
-                    # cv2.imshow('Detection Output', annotated_frame)
-                    # if cv2.waitKey(1) & 0xFF == ord('q'):
-                    #     break
+                    # Add debug display
+                    cv2.imshow('Detection Output', annotated_frame)
+                    if cv2.waitKey(1) & 0xFF == ord('q'):
+                        break
                     
                     # Predict the sign type of each crop
                     for cropped_image in cropped_signs:
@@ -293,8 +298,7 @@ if __name__ == "__main__" :
                         if current_sign != last_sign:                            
                             message = f"Sign Type is: {current_sign}"
                             try:
-                                # send_mqtt(mqtt_client, message)
-                                publish.single(MQTT_TOPIC, message, hostname=MQTT_BROKER)
+                                mqtt_client.publish(MQTT_TOPIC, message)
                                 last_sign = current_sign       # Update last sent sign
                             except KeyboardInterrupt:
                                 print("\nShutting down the publisher.")
@@ -319,8 +323,7 @@ if __name__ == "__main__" :
                         if current_sign != last_sign:
                             message = f"Sign Type is: {current_sign}"
                             try:
-                                # send_mqtt(mqtt_client, message)
-                                publish.single(MQTT_TOPIC, message, hostname=MQTT_BROKER)
+                                mqtt_client.publish(MQTT_TOPIC, message)
                                 last_sign = current_sign        # Update last sent sign
                             except KeyboardInterrupt:
                                 print("\nShutting down the client.")
@@ -328,4 +331,8 @@ if __name__ == "__main__" :
     except KeyboardInterrupt:
         print("\nShutting down the client.")
     finally:
+        # Close the mqtt connection
+        mqtt_client.loop_stop()
+        mqtt_client.disconnect()
+        cap.release()
         print("Publisher closed.")
