@@ -197,7 +197,7 @@ if __name__ == "__main__" :
     confidence_threshold = 0.34
 
     # New variables for frame skipping and duplicate detection
-    frame_interval = 5          # Process every 10th frame
+    frame_interval = 5          # Process every 5th frame
     last_sign = None            # Track last sent sign
     frame_counter = 0           # Count processed frames
 
