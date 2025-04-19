@@ -254,7 +254,7 @@ if __name__ == "__main__" :
     root = os.getcwd()
     detection_model_path = r'detection_model/best_quant_v2.onnx'     # for linux
     input_type = 'video'                                        # Change to 'image' or 'camera' as needed
-    input_source = r'test_videos/video2.mp4'                    # Required for 'video' or 'image' (for linux)
+    input_source = r'test_videos/video1.mp4'                    # Required for 'video' or 'image' (for linux)
 
     # Initialize model and input source
     detection_model, cap, input_images = initialize_model_and_source(detection_model_path, input_type, input_source)
@@ -282,10 +282,10 @@ if __name__ == "__main__" :
 
                     # Process the frame and get the cropped signs
                     annotated_frame, cropped_signs = process_frame(detection_model, confidence_threshold, frame)
-                    # Add debug display
-                    cv2.imshow('Detection Output', annotated_frame)
-                    if cv2.waitKey(1) & 0xFF == ord('q'):
-                        break
+                    # # Add debug display
+                    # cv2.imshow('Detection Output', annotated_frame)
+                    # if cv2.waitKey(1) & 0xFF == ord('q'):
+                    #     break
                     
                     # Predict the sign type of each crop
                     for cropped_image in cropped_signs:
