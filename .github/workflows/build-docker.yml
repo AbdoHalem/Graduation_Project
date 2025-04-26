@@ -15,7 +15,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Build the Docker image of lane_detection for arm64
-      run: docker buildx build --platform linux/arm64 -t halem10/lane_detection:1.2 -f ./lane_detection/Dockerfile ..
+      run: docker buildx build --platform linux/arm64 -t halem10/lane_detection:1.2 -f lane_detection/Dockerfile ..
     - name: Push the Docker image to Docker Hub
       run: |
         docker login -u halem10 -p ${{ secrets.DOCKER_HUB_TOKEN }}
