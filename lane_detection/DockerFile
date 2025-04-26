@@ -1,5 +1,5 @@
-# Use the official Raspberry Pi OS base image with Python 3.8
-FROM python:3.9-slim
+# Use an ARM-compatible base image
+FROM --platform=linux/arm64 python:3.9-slim
 
 # Install system dependencies and build tools
 RUN apt-get update && apt-get install -y \
