@@ -1,5 +1,5 @@
 # Use an ARM-compatible base image
-FROM --platform=linux/arm64 python:3.9-slim
+FROM --platform=linux/arm64 python:3.8-slim
 
 # Install system dependencies and build tools
 RUN apt-get update && apt-get install -y \
