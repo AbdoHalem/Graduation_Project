@@ -36,7 +36,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: lane_detection                # your app folder
-          file: lane_detection/Dockerfile        # path to Dockerfile
+          file: ./lane_detection/Dockerfile        # path to Dockerfile
           platforms: linux/arm64                 # target architecture
           push: true
           tags: halem10/lane_detection:1.2       # your Docker Hub repo:tag
