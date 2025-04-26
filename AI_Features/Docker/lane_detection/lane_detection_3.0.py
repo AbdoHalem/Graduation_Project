@@ -2,7 +2,18 @@ import numpy as np
 import cv2
 from moviepy.editor import VideoFileClip
 import tflite_runtime.interpreter as tflite
-import paho.mqtt.publish as publish
+# import paho.mqtt.publish as publish
+import paho.mqtt.client as mqtt
+
+# MQTT Configuration
+MQTT_BROKER = "test.mosquitto.org"
+MQTT_PORT = 1883
+MQTT_TOPIC = "ADAS_GP/sign"
+
+# 1️⃣ Initialize a persistent MQTT client
+mqtt_client = mqtt.Client()
+mqtt_client.connect(MQTT_BROKER, MQTT_PORT, keepalive=60)
+mqtt_client.loop_start()
 
 # Create a Kalman filter for the deviation variable
 kalman_dev = cv2.KalmanFilter(1, 1)
@@ -108,8 +119,8 @@ def road_lines_status(image, update_model=True):
 
 if __name__ == '__main__':
     # Creat an MQTT client
-    MQTT_SERVER = "test.mosquitto.org"
-    MQTT_PATH = "ADAS_GP/lane"
+    # MQTT_SERVER = "test.mosquitto.org"
+    # MQTT_PATH = "ADAS_GP/lane"
     
     # Create a Lanes object for temporal smoothing
     lanes = Lanes()
@@ -128,7 +139,8 @@ if __name__ == '__main__':
         if frame_count % 10 == 0:
             status = road_lines_status(frame, update_model=True)
             # Send the status of the car according to the lane
-            publish.single(MQTT_PATH, str(status), hostname=MQTT_SERVER)
+            # publish.single(MQTT_PATH, str(status), hostname=MQTT_SERVER)
+            mqtt_client.publish(MQTT_TOPIC, str(status))
             print(status)
         else:
             status = road_lines_status(frame, update_model=False)
