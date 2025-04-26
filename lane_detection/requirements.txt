@@ -1,0 +1,9 @@
+# keras==2.13.1
+IPython
+moviepy==1.0.3
+# numpy
+paho-mqtt==1.6.1
+tflite-runtime==2.13.0
+opencv-python
+scikit-learn
+scipy==1.10.1
