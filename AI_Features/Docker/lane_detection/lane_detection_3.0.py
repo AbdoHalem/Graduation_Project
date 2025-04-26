@@ -8,7 +8,7 @@ import paho.mqtt.client as mqtt
 # MQTT Configuration
 MQTT_BROKER = "test.mosquitto.org"
 MQTT_PORT = 1883
-MQTT_TOPIC = "ADAS_GP/sign"
+MQTT_TOPIC = "ADAS_GP/lane"
 
 # 1️⃣ Initialize a persistent MQTT client
 mqtt_client = mqtt.Client()
