@@ -1,7 +1,7 @@
 name: Yocto Build (Raspberry Pi 3)
 
 on:
-  workflow_dispatch:  # Allow the build to be manually triggered via GitHub UI
+  [workflow_dispatch]:  # Allow the build to be manually triggered via GitHub UI
 
 jobs:
   build:
