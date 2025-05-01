@@ -16,7 +16,7 @@ MQTT_PORT = 1883
 MQTT_TOPIC = "ADAS_GP/sign"
 
 # 1️⃣ Initialize a persistent MQTT client
-mqtt_client = mqtt.Client()
+mqtt_client = mqtt.Client(callback_api_version=mqtt.CallbackAPIVersion.VERSION2)
 mqtt_client.connect(MQTT_BROKER, MQTT_PORT, keepalive=60)
 mqtt_client.loop_start()
 
@@ -254,7 +254,7 @@ if __name__ == "__main__" :
     root = os.getcwd()
     detection_model_path = r'detection_model/best_quant_v2.onnx'     # for linux
     input_type = 'video'                                        # Change to 'image' or 'camera' as needed
-    input_source = r'test_videos/video1.mp4'                    # Required for 'video' or 'image' (for linux)
+    input_source = r'test_videos/video2.mp4'                    # Required for 'video' or 'image' (for linux)
 
     # Initialize model and input source
     detection_model, cap, input_images = initialize_model_and_source(detection_model_path, input_type, input_source)
@@ -295,7 +295,7 @@ if __name__ == "__main__" :
                         # Get current sign prediction
                         current_sign = predict_sign(cropped_image)
                         # Only send if sign is different from previous
-                        if current_sign != last_sign:                            
+                        if (current_sign != last_sign) and (current_sign != "Unknown Sign"):                            
                             message = f"Sign Type is: {current_sign}"
                             try:
                                 mqtt_client.publish(MQTT_TOPIC, message)
@@ -320,7 +320,7 @@ if __name__ == "__main__" :
                         # Get current sign prediction
                         current_sign = predict_sign(cropped_image)
                         # Only send if sign is different from previous
-                        if current_sign != last_sign:
+                        if (current_sign != last_sign) and (current_sign != "Unknown Sign"):
                             message = f"Sign Type is: {current_sign}"
                             try:
                                 mqtt_client.publish(MQTT_TOPIC, message)
