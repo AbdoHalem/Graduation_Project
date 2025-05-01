@@ -253,8 +253,8 @@ if __name__ == "__main__" :
     # Get the detection model and video paths
     root = os.getcwd()
     detection_model_path = r'detection_model/best_quant_v2.onnx'     # for linux
-    input_type = 'video'                                        # Change to 'image' or 'camera' as needed
-    input_source = r'test_videos/video2.mp4'                    # Required for 'video' or 'image' (for linux)
+    input_type = 'camera'                                        # Change to 'image' or 'camera' as needed
+    input_source = r'test_videos/video2.mp4'                     # Required for 'video' or 'image' (for linux)
 
     # Initialize model and input source
     detection_model, cap, input_images = initialize_model_and_source(detection_model_path, input_type, input_source)
