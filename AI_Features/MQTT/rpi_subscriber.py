@@ -36,11 +36,24 @@ userdata = {
 }
 
 # Create an MQTT client
-client = mqtt.Client(userdata=userdata, protocol=mqtt.MQTTv311)
+# client = mqtt.Client(userdata=userdata, protocol=mqtt.MQTTv311)
+client = mqtt.Client(userdata=userdata, protocol=mqtt.MQTTv311,
+                     callback_api_version=mqtt.CallbackAPIVersion.VERSION2)
 
 # Assign callback functions
-client.on_connect = on_connect
-client.on_message = on_message
+# client.on_connect = on_connect
+@client.connect_callback()
+def handle_connect(client, userdata, flags, reason_code, properties):
+    print(f"Connected with result code {reason_code}")
+    for topic in topics:
+        client.subscribe(topic)
+    print("Subscribed to topics:", topics)
+
+# client.on_message = on_message
+@client.message_callback()
+def handle_message(client, userdata, message):
+    print(f"{message.topic} => {message.payload.decode()}")
+    userdata["messages"][message.topic] = message.payload.decode()
 
 # Connect to the broker
 client.connect(broker, port, 60)
