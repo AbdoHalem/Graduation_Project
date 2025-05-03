@@ -121,7 +121,7 @@ if __name__ == '__main__':
     lanes = Lanes()
 
     # Input video path
-    input_video = "Test_Videos/home.mp4"
+    input_video = "Test_Videos/Car.mp4"
     clip = VideoFileClip(input_video)
 
     # Detect at every 10 frame and store the lane status (1: on lane, 0: off lane)
