@@ -1,6 +1,6 @@
 import numpy as np
 import cv2
-from moviepy.editor import VideoFileClip
+import time
 import tflite_runtime.interpreter as tflite
 import paho.mqtt.client as mqtt
 
@@ -120,16 +120,22 @@ if __name__ == '__main__':
     # Create a Lanes object for temporal smoothing
     lanes = Lanes()
 
-    # Input video path
-    input_video = "Test_Videos/Car.mp4"
-    clip = VideoFileClip(input_video)
-
     # Detect at every 10 frame and store the lane status (1: on lane, 0: off lane)
     frame_count = 0
     status = None
 
+    cap = cv2.VideoCapture(0)
+    if not cap.isOpened():
+        raise RuntimeError("Cannot open /dev/video0; check V4L2 driver")
+
+    print("Starting lane detection on camera stream (press Ctrl+C to stop)")
     print("Lane status for each frame (1: On Lane, 0: Off Lane):")
-    for frame in clip.iter_frames():
+
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            time.sleep(0.1)
+            continue
         # Detect the lane every 10 frames not at each frame
         if frame_count % 10 == 0:
             status = road_lines_status(frame, update_model=True)
@@ -140,5 +146,7 @@ if __name__ == '__main__':
             status = road_lines_status(frame, update_model=False)
         
         frame_count += 1
+
+    cap.release()
 
    
