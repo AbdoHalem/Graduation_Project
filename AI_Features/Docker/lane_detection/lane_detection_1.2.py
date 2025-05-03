@@ -2,7 +2,6 @@ import numpy as np
 import cv2
 from moviepy.editor import VideoFileClip
 import tflite_runtime.interpreter as tflite
-# import paho.mqtt.publish as publish
 import paho.mqtt.client as mqtt
 
 # MQTT Configuration
@@ -118,15 +117,11 @@ def road_lines_status(image, update_model=True):
     return status
 
 if __name__ == '__main__':
-    # Creat an MQTT client
-    # MQTT_SERVER = "test.mosquitto.org"
-    # MQTT_PATH = "ADAS_GP/lane"
-    
     # Create a Lanes object for temporal smoothing
     lanes = Lanes()
 
     # Input video path
-    input_video = "Test_Videos/Car.mp4"
+    input_video = "Test_Videos/home.mp4"
     clip = VideoFileClip(input_video)
 
     # Detect at every 10 frame and store the lane status (1: on lane, 0: off lane)
@@ -139,7 +134,6 @@ if __name__ == '__main__':
         if frame_count % 10 == 0:
             status = road_lines_status(frame, update_model=True)
             # Send the status of the car according to the lane
-            # publish.single(MQTT_PATH, str(status), hostname=MQTT_SERVER)
             mqtt_client.publish(MQTT_TOPIC, str(status))
             print(status)
         else:
