@@ -41,4 +41,4 @@ COPY . /app
 EXPOSE 5000
 
 # Command to run the application
-CMD ["python", "lane_detection_3.0.py"]
+CMD ["python", "lane_detection_1.2.py"]
