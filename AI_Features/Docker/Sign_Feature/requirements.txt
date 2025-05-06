@@ -1,4 +1,4 @@
 onnxruntime==1.19.2
 paho-mqtt==2.1.0
-tflite-runtime==2.14.0
+tflite-runtime==2.13.0
 #opencv-python==4.11.0.86
