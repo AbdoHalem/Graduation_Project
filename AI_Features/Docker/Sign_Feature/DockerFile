@@ -17,6 +17,9 @@ RUN apt-get update && apt-get install -y \
     x11-apps \
     && rm -rf /var/lib/apt/lists/*
 
+# Force all V4L2 opens through libv4l2
+ENV LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libv4l2.so.0
+
 # Set the working directory
 WORKDIR /app
 
