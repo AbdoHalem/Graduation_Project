@@ -14,11 +14,7 @@ RUN apt-get update && apt-get install -y \
     # V4L2 support for Pi CSI camera
     v4l-utils libv4l-dev \
     libcamera-dev libcamera0 libboost-dev \
-    gstreamer1.0-libav gstreamer1.0-plugins-base \
-    gstreamer1.0-plugins-good gstreamer1.0-plugins-bad \
-    gstreamer1.0-plugins-ugly libgstreamer1.0-dev \
-    libgstreamer-plugins-base1.0-dev libcamera-dev \
-    libcamera-apps gstreamer1.0-libcamera \
+    libcamera-apps \
     # X11 client so cv2.imshow can connect to the host display
     x11-apps \
     && rm -rf /var/lib/apt/lists/*
