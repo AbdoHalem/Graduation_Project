@@ -26,13 +26,7 @@ jobs:
         uses: docker/login-action@v2
         with:
           username: halem10
-          password: ${{ secrets.DOCKER_HUB_TOKEN }}
-
-      # (Optional) Ensure the Docker Compose v2 plugin is present
-      - name: Install Compose plugin
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y docker-compose-plugin 
+          password: ${{ secrets.DOCKER_HUB_TOKEN }} 
 
       # 5) Build & push using docker-compose
       - name: Build & push with Docker Compose
