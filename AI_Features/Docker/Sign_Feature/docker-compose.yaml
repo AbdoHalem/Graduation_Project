@@ -3,6 +3,7 @@
 services:
   sign_publisher:
     image: halem10/sign_feature:1.4
+    platform: linux/arm64
     build: 
       context: .
       dockerfile: DockerFile
