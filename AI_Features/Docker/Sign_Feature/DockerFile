@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y \
     # OpenCV GUI/backends
     python3-opencv libgtk-3-0 libgtk-3-dev libgl1-mesa-glx \
     # V4L2 support for Pi CSI camera
-    v4l-utils libv4l-dev libcamera-apps \
+    v4l-utils libv4l-dev \
     # X11 client so cv2.imshow can connect to the host display
     x11-apps \
     && rm -rf /var/lib/apt/lists/*
