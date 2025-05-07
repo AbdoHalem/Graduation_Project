@@ -28,15 +28,21 @@ jobs:
           username: halem10
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
 
+      # (Optional) Ensure the Docker Compose v2 plugin is present
+      - name: Install Compose plugin
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose-plugin 
+
       # 5) Build & push using docker-compose
       - name: Build & push with Docker Compose
         working-directory: AI_Features/Docker/Sign_Feature
         run: |
           # Ensure Compose V2 is used (`docker compose` vs `docker-compose` if needed)
-          docker-compose version
+          docker compose version
 
           # Build your service(s) using the ARM64 platform
-          docker-compose build --parallel
+          docker compose build --parallel
 
           # Push the built image(s) to Docker Hub
-          docker-compose push
+          docker compose push
