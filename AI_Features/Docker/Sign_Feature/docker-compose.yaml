@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  sign_publisher:
+    build: .
+    # Grant access to the camera hardware
+    devices:
+      - /dev/vchiq:/dev/vchiq
+      # If you’ve enabled V4L2 compatibility on the host, you can also map:
+      - /dev/video0:/dev/video0
+    # Needed for OpenCV windows (optional—only if you use cv2.imshow)
+    environment:
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+    volumes:
+      # Allow X11 socket to pass through (optional)
+      - /tmp/.X11-unix:/tmp/.X11-unix:ro
+    # Share IPC namespace so shared-memory backends work
+    ipc: host
+    # Use host networking so libcamera & MQTT access works out of the box
+    network_mode: host
+    # Keep STDIN open & allocate a TTY for interactive debugging
+    stdin_open: true
+    tty: true
+    # Expose your app port if you serve anything (you’re currently using 6000)
+    ports:
+      - "6000:6000"
