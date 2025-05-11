@@ -44,7 +44,9 @@ def initialize_model_and_source(model_path, input_type, input_source=None):
     if input_type == 'video':
         cap = cv2.VideoCapture(input_source)
     elif input_type == 'camera':
-        cap = cv2.VideoCapture(0)  # Default to the first connected camera
+        cap = cv2.VideoCapture(0, cv2.CAP_V4L2)  # Default to the first connected camera
+        cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
     elif input_type == 'image':
         if os.path.isdir(input_source):
             input_images = [os.path.join(input_source, f) for f in os.listdir(input_source)
@@ -60,6 +62,10 @@ def initialize_model_and_source(model_path, input_type, input_source=None):
 # NEW: frame → ONNX‑ready input tensor
 def preprocessor(frame, input_width, input_height):
     # 1) resize & pad to square
+    # frame must be HxWx3 here
+    h, w = frame.shape[:2]
+    if frame.ndim != 3 or frame.shape[2] != 3:
+        raise ValueError(f"preprocessor() expected 3-channel frame, got shape {frame.shape}")
     x = cv2.resize(frame, (input_width, input_height))
     # 2) normalize to [0,1]
     image_data = x.astype(np.float32) / 255.0
@@ -253,15 +259,15 @@ if __name__ == "__main__" :
     # Get the detection model and video paths
     root = os.getcwd()
     detection_model_path = r'detection_model/best_quant_v2.onnx'     # for linux
-    input_type = 'camera'                                        # Change to 'image' or 'camera' as needed
-    input_source = r'test_videos/video2.mp4'                     # Required for 'video' or 'image' (for linux)
+    input_type = 'image'                                        # Change to 'image' or 'camera' as needed
+    input_source = r'/app/frames'                     # Required for 'video' or 'image' (for linux)
 
     # Initialize model and input source
     detection_model, cap, input_images = initialize_model_and_source(detection_model_path, input_type, input_source)
     confidence_threshold = 0.34
 
     # New variables for frame skipping and duplicate detection
-    frame_interval = 5          # Process every 5th frame
+    FRAME_INTERVAL = 5          # Process every 5th frame
     last_sign = None            # Track last sent sign
     frame_counter = 0           # Count processed frames
 
@@ -275,9 +281,13 @@ if __name__ == "__main__" :
                     if not ret:
                         break
 
+                    # ensure we have 3 channels
+                    if frame.ndim == 2:
+                        frame = cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)
+
                     frame_counter += 1
-                    # Only process every 10th frame
-                    if frame_counter % frame_interval != 0:
+                    # Only process every 5th frame
+                    if frame_counter % FRAME_INTERVAL != 0:
                         continue
 
                     # Process the frame and get the cropped signs
@@ -309,6 +319,10 @@ if __name__ == "__main__" :
                 print("Error: No images found in the specified directory.")
             else:
                 for image_path in input_images:
+                    # Only process every 5th frame
+                    if frame_counter % FRAME_INTERVAL != 0:
+                        continue
+
                     frame = cv2.imread(image_path)
                     # Process the image
                     _, cropped_signs = process_frame(detection_model, confidence_threshold, frame)
@@ -334,5 +348,6 @@ if __name__ == "__main__" :
         # Close the mqtt connection
         mqtt_client.loop_stop()
         mqtt_client.disconnect()
-        cap.release()
+        if input_type != 'image':
+            cap.release()
         print("Publisher closed.")
