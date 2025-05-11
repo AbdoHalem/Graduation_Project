@@ -21,7 +21,7 @@ services:
       - video  # Add container to video group for device access
     volumes:
       # Mount the directory containing this compose file into /app
-      - ./:/app/frames
+      - ./frames:/app/frames
       # Allow X11 socket to pass through (optional)
       - /tmp/.X11-unix:/tmp/.X11-unix:ro
     # Share IPC namespace so shared-memory backends work
