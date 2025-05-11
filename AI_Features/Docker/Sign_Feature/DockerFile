@@ -20,7 +20,7 @@ RUN apt-get update && apt-get install -y \
     # V4L2 support for Pi CSI camera
     v4l-utils libv4l-dev \
     # X11 client so cv2.imshow can connect to the host display
-    x11-apps \
+    x11-apps nano \
     && rm -rf /var/lib/apt/lists/*
 
 # Force all V4L2 opens through libv4l2
