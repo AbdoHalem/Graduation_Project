@@ -17,7 +17,7 @@ MQTT_TOPIC = "ADAS_GP/sign"
 # shared flag to check the feature controlled status from the GUI
 status = "on"
 
-def on_connect(client, userdata, flags, rc):
+def on_connect(client, userdata, flags, rc, properties=None):
     print("MQTT connected, subscribing to", MQTT_TOPIC)
     client.subscribe(MQTT_TOPIC)
 
@@ -337,6 +337,7 @@ if __name__ == "__main__" :
             elif input_type == 'image':
                 if not input_images:
                     print("Error: No images found in the specified directory.")
+                    time.sleep(1)
                     continue
                 else:
                     index = 0
@@ -350,6 +351,9 @@ if __name__ == "__main__" :
                         index = (index + 1) % len(input_images)
                         # Read the frame
                         frame = cv2.imread(image_path)
+                        if frame is None:
+                            print(f"Warning: failed to load {image_path}, skipping")
+                            continue
                         # Process the image
                         _, cropped_signs = process_frame(detection_model, confidence_threshold, frame)
                         # Predict the sign type of each image
