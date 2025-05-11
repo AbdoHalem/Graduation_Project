@@ -1,10 +1,10 @@
-import os
+import os, time, sys
 import numpy as np
 import cv2
 import tflite_runtime.interpreter as tflite
 import paho.mqtt.client as mqtt
 import onnxruntime
-import sys
+
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'    # To disaple displaying the tensorflow logs
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"   # Disable GPU
 # Ensure the expected module is available in sys.modules:
@@ -14,11 +14,28 @@ sys.modules['np._core.multiarray'] = np.core.multiarray
 MQTT_BROKER = "test.mosquitto.org"
 MQTT_PORT = 1883
 MQTT_TOPIC = "ADAS_GP/sign"
+# shared flag to check the feature controlled status from the GUI
+status = "on"
+
+def on_connect(client, userdata, flags, rc):
+    print("MQTT connected, subscribing to", MQTT_TOPIC)
+    client.subscribe(MQTT_TOPIC)
+
+def on_message(client, userdata, msg):
+    global status
+    text = msg.payload.decode("utf-8", errors="ignore").strip().lower()
+    print(f"[MQTT ←] {text}")
+    if text in ("on","off"):
+        status = text
+        print(f"→ status set to {status}")
 
 # 1️⃣ Initialize a persistent MQTT client
 mqtt_client = mqtt.Client(callback_api_version=mqtt.CallbackAPIVersion.VERSION2)
+mqtt_client.on_connect = on_connect
+mqtt_client.on_message = on_message
 mqtt_client.connect(MQTT_BROKER, MQTT_PORT, keepalive=60)
 mqtt_client.loop_start()
+time.sleep(1)   # give on_connect/on_message a moment to run
 
 '''################# Detection Functions #################'''
 def initialize_model_and_source(model_path, input_type, input_source=None):
@@ -272,22 +289,27 @@ if __name__ == "__main__" :
     frame_counter = 0           # Count processed frames
 
     try:
-        if input_type in ['video', 'camera']:
-            if not cap.isOpened():
-                print("Error: Unable to open the input source.")
-            else:
-                while cap.isOpened():
+        while True:
+            # only run detection when status == "on"
+            if status != "on":
+                # you can sleep a bit to avoid busy‐spin
+                time.sleep(0.5); continue
+            
+            if input_type in ['video', 'camera']:
+                if not cap.isOpened():
+                    print("Error: Unable to open the input source.")
+                    break
+                else:
                     ret, frame = cap.read()
                     if not ret:
                         break
-
                     # ensure we have 3 channels
                     if frame.ndim == 2:
                         frame = cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)
 
-                    frame_counter += 1
+                    frame_counter = (frame_counter + 1) % FRAME_INTERVAL
                     # Only process every 5th frame
-                    if frame_counter % FRAME_INTERVAL != 0:
+                    if frame_counter != 0:
                         continue
 
                     # Process the frame and get the cropped signs
@@ -307,43 +329,48 @@ if __name__ == "__main__" :
                         # Only send if sign is different from previous
                         if (current_sign != last_sign) and (current_sign != "Unknown Sign"):                            
                             message = f"Sign Type is: {current_sign}"
-                            try:
-                                mqtt_client.publish(MQTT_TOPIC, message)
-                                last_sign = current_sign       # Update last sent sign
-                            except KeyboardInterrupt:
-                                print("\nShutting down the publisher.")
-                cap.release()
-        
-        elif input_type == 'image':
-            if not input_images:
-                print("Error: No images found in the specified directory.")
-            else:
-                for image_path in input_images:
-                    # Only process every 5th frame
-                    if frame_counter % FRAME_INTERVAL != 0:
-                        continue
+                            mqtt_client.publish(MQTT_TOPIC, message)
+                            last_sign = current_sign       # Update last sent sign
+                    time.sleep(0.001)
 
-                    frame = cv2.imread(image_path)
-                    # Process the image
-                    _, cropped_signs = process_frame(detection_model, confidence_threshold, frame)
-                    # Predict the sign type of each image
-                    for cropped_image in cropped_signs:
-                        if cropped_image.size == 0:
+            
+            elif input_type == 'image':
+                if not input_images:
+                    print("Error: No images found in the specified directory.")
+                    continue
+                else:
+                    index = 0
+                    try:
+                        # Only process every FRAME_INTERVAL-th image
+                        frame_counter = (frame_counter + 1) % FRAME_INTERVAL
+                        if frame_counter != 0:
                             continue
+                        # pick next image (wrap around at end)
+                        image_path = input_images[index]
+                        index = (index + 1) % len(input_images)
+                        # Read the frame
+                        frame = cv2.imread(image_path)
+                        # Process the image
+                        _, cropped_signs = process_frame(detection_model, confidence_threshold, frame)
+                        # Predict the sign type of each image
+                        for cropped_image in cropped_signs:
+                            if cropped_image.size == 0:
+                                continue
 
-                        # Get current sign prediction
-                        current_sign = predict_sign(cropped_image)
-                        # Only send if sign is different from previous
-                        if (current_sign != last_sign) and (current_sign != "Unknown Sign"):
-                            message = f"Sign Type is: {current_sign}"
-                            try:
+                            # Get current sign prediction
+                            current_sign = predict_sign(cropped_image)
+                            # Only send if sign is different from previous
+                            if (current_sign != last_sign) and (current_sign != "Unknown Sign"):
+                                message = f"Sign Type is: {current_sign}"
                                 mqtt_client.publish(MQTT_TOPIC, message)
                                 last_sign = current_sign        # Update last sent sign
-                            except KeyboardInterrupt:
-                                print("\nShutting down the client.")
-
+                        # small delay so we don’t spin too fast
+                        time.sleep(0.01)
+                    except KeyboardInterrupt:
+                        print("\nInterrupted by user.")
+                    
     except KeyboardInterrupt:
-        print("\nShutting down the client.")
+        print("\nInterrupted by user.")
     finally:
         # Close the mqtt connection
         mqtt_client.loop_stop()
