@@ -4,6 +4,7 @@ import cv2
 import tflite_runtime.interpreter as tflite
 import paho.mqtt.client as mqtt
 import onnxruntime
+import socket, struct
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'    # To disaple displaying the tensorflow logs
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"   # Disable GPU
@@ -29,13 +30,37 @@ def on_message(client, userdata, msg):
         status = text
         print(f"→ status set to {status}")
 
-# 1️⃣ Initialize a persistent MQTT client
+# 1 Initialize a persistent MQTT client
 mqtt_client = mqtt.Client(callback_api_version=mqtt.CallbackAPIVersion.VERSION2)
 mqtt_client.on_connect = on_connect
 mqtt_client.on_message = on_message
 mqtt_client.connect(MQTT_BROKER, MQTT_PORT, keepalive=60)
 mqtt_client.loop_start()
 time.sleep(1)   # give on_connect/on_message a moment to run
+
+# Before loading models, set up the TCP server that will hand you JPEG frames:
+HOST = "0.0.0.0"
+PORT = 9999
+
+def recvall(sock, count):
+    """Read exactly `length` bytes from the socket."""
+    buf = b''
+    while len(buf) < count:
+        chunk = sock.recv(count - len(buf))
+        if not chunk:
+            return None
+        buf += chunk
+    return buf
+
+
+# # Start TCP server to listen for the RPi sender
+# server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# server.bind((HOST, PORT))
+# server.listen(1)
+# print(f"[Socket] Listening on {HOST}:{PORT}")
+# conn, addr = server.accept()
+# print(f"[Socket] Connection from {addr}")
+
 
 '''################# Detection Functions #################'''
 def initialize_model_and_source(model_path, input_type, input_source=None):
@@ -276,15 +301,24 @@ if __name__ == "__main__" :
     # Get the detection model and video paths
     root = os.getcwd()
     detection_model_path = r'detection_model/best_quant_v2.onnx'     # for linux
-    input_type = 'image'                                        # Change to 'image' or 'camera' as needed
-    input_source = r'/app/frames'                     # Required for 'video' or 'image' (for linux)
+    input_type = 'camera'                                        # Change to 'image' or 'camera' as needed
+    input_source = r'.'                     # Required for 'video' or 'image' (for linux)
+
+    if input_type == 'image':
+        # Start TCP server to listen for the RPi sender
+        server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        server.bind((HOST, PORT))
+        server.listen(1)
+        print(f"[Socket] Listening on {HOST}:{PORT}")
+        conn, addr = server.accept()
+        print(f"[Socket] Connection from {addr}")
 
     # Initialize model and input source
     detection_model, cap, input_images = initialize_model_and_source(detection_model_path, input_type, input_source)
     confidence_threshold = 0.34
 
     # New variables for frame skipping and duplicate detection
-    FRAME_INTERVAL = 5          # Process every 5th frame
+    FRAME_INTERVAL = 1          # Process every 5th frame
     last_sign = None            # Track last sent sign
     frame_counter = 0           # Count processed frames
 
@@ -335,50 +369,73 @@ if __name__ == "__main__" :
 
             
             elif input_type == 'image':
-                if not input_images:
-                    print("Error: No images found in the specified directory.")
-                    time.sleep(1)
-                    continue
-                else:
-                    index = 0
-                    try:
-                        # Only process every FRAME_INTERVAL-th image
-                        frame_counter = (frame_counter + 1) % FRAME_INTERVAL
-                        if frame_counter != 0:
-                            continue
-                        # pick next image (wrap around at end)
-                        image_path = input_images[index]
-                        index = (index + 1) % len(input_images)
-                        # Read the frame
-                        frame = cv2.imread(image_path)
-                        if frame is None:
-                            print(f"Warning: failed to load {image_path}, skipping")
-                            continue
-                        # Process the image
-                        _, cropped_signs = process_frame(detection_model, confidence_threshold, frame)
-                        # Predict the sign type of each image
-                        for cropped_image in cropped_signs:
-                            if cropped_image.size == 0:
-                                continue
+                try:
+                    # Only process every FRAME_INTERVAL-th frame
+                    frame_counter = (frame_counter + 1) % FRAME_INTERVAL
+                    if frame_counter != 0:
+                        continue
 
-                            # Get current sign prediction
-                            current_sign = predict_sign(cropped_image)
-                            # Only send if sign is different from previous
-                            if (current_sign != last_sign) and (current_sign != "Unknown Sign"):
-                                message = f"Sign Type is: {current_sign}"
-                                mqtt_client.publish(MQTT_TOPIC, message)
-                                last_sign = current_sign        # Update last sent sign
-                        # small delay so we don’t spin too fast
-                        time.sleep(0.01)
-                    except KeyboardInterrupt:
-                        print("\nInterrupted by user.")
+                     # 1) Read 4‑byte length header
+                    header = recvall(conn, 4)
+                    if not header:
+                        print("[Socket] Connection closed")
+                        break
+
+                    # 2) Unpack JPEG length
+                    length, = struct.unpack('!I', header)
+                    # Optional sanity check:
+                    if length <= 0 or length > 5_000_000:
+                        print(f"[Socket] Invalid frame length: {length}")
+                        continue
+                    # 3) Read exactly `length` bytes of JPEG data
+                    data = recvall(conn, length)
+                    if data is None:
+                        print("[Socket] Failed to receive full frame")
+                        break
+
+                    # 4) Decode to BGR image
+                    buf = np.frombuffer(data, dtype=np.uint8)
+                    frame = cv2.imdecode(buf, cv2.IMREAD_COLOR)
+                    if frame is None:
+                        print("[Socket] Decoding failed")
+                        continue
+                    #print("Frame is decoded coorectly!")
+                    #cv2.imwrite("frames/test.jpg", frame)
+                    # 5) Process the frame just like before
+                    _, cropped_signs = process_frame(detection_model,
+                                                     confidence_threshold,
+                                                     frame)
+
+                    # Predict & MQTT as usual
+                    for cropped_image in cropped_signs:
+                        if cropped_image.size == 0:
+                            continue  # Skip empty crops
+
+                        current_sign = predict_sign(cropped_image)
+                        if (current_sign != last_sign) and (current_sign != "Unknown Sign"):
+                            message = f"Sign Type is: {current_sign}"
+                            mqtt_client.publish(MQTT_TOPIC, message)
+                            last_sign = current_sign
+
+                    # small delay so we don’t spin at 100%
+                    time.sleep(0.005)
+
+                except KeyboardInterrupt:
+                    print("\nInterrupted by user.")
+                    break
                     
     except KeyboardInterrupt:
         print("\nInterrupted by user.")
+        
     finally:
         # Close the mqtt connection
         mqtt_client.loop_stop()
         mqtt_client.disconnect()
         if input_type != 'image':
             cap.release()
+        else:
+            # clean up sockets
+            server.close()
+            conn.close()
+
         print("Publisher closed.")
