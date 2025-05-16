@@ -9,12 +9,12 @@ ENV DISPLAY=:0
 
 # Install system dependencies and build tools
 RUN apt-get update && apt-get install -y \
-    libatlas-base-dev \
-    libhdf5-dev libhdf5-serial-dev \
-    libjpeg-dev liblapack-dev libpng-dev \
+    # libatlas-base-dev libopenblas-dev \
+    # libhdf5-dev libhdf5-serial-dev liblapack-dev \
+    libjpeg-dev libpng-dev \
     libtiff-dev libwebp-dev ffmpeg \
-    build-essential gfortran cmake pkg-config \
-    libopenblas-dev libglib2.0-0 libgtk-3-dev \
+    # build-essential gfortran cmake pkg-config \
+    libglib2.0-0 libgtk-3-dev \
     # OpenCV GUI/backends
     python3-opencv libgtk-3-0 libgl1-mesa-glx \
     # V4L2 support for Pi CSI camera
@@ -32,9 +32,6 @@ WORKDIR /app
 # Upgrade pip to help fetch pre-built wheels if available
 RUN pip install --upgrade pip setuptools wheel
 
-# # Install NumPy first to satisfy requirements
-# RUN pip install --no-cache-dir numpy==1.24.3
-
 # Copy the requirements file
 COPY requirements.txt /app/requirements.txt
 
@@ -42,7 +39,7 @@ COPY requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application code
-COPY . /app
+COPY DockerFile,Sign_Publisher_V2.0.py,detection_model,recognition_model  /app
 
 # Expose the port the app runs on
 EXPOSE 6000
