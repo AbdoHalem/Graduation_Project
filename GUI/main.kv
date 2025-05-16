@@ -1,0 +1,1054 @@
+#:kivy 2.0.0  
+ScreenManager:
+    MainScreen:
+    FirstPathScreen:
+    SecondPathScreen:
+    Subscreen1:
+    Subscreen2:
+    Subscreen3:
+    Subscreen4:
+    Subscreen5:
+    Drowsy:
+    Sign:
+    Lane:
+    CollisionAvoidance:
+    BlindSpot:
+
+<MainScreen>:
+    name: "main"
+    MDBoxLayout:
+        orientation: 'vertical'
+        MDLabel:
+            id: welcome_text
+            text: "Advanced driver-assistance system"
+            font_style: "H3"
+            bold: True
+            #theme_text_color: "Custom"
+            text_color: 0.2, 0.2, 0.2, 1
+            halign: 'center'
+        Image:
+            id: face_image
+            source: "img/user.png"
+            size_hint: None, None
+            size: "300dp", "300dp"
+            pos_hint: {"center_x": 0.5}
+        MDLabel:
+            id: waiting_input
+            text: "Waiting for face recognition..."
+            halign: 'center'
+            theme_text_color: "Secondary"
+            font_style: "H6"
+        MDTextField:
+            id: password_input
+            hint_text: "Enter Password"
+            mode: "rectangle"
+            size_hint: None, None
+            size: "250dp", "40dp"
+            pos_hint: {"center_x": 0.5}
+            opacity: 0
+            disabled: True
+        MDRaisedButton:
+            id: enter_button
+            text: "Enter"
+            size_hint: None, None
+            size: "200dp", "50dp"
+            pos_hint: {"center_x": 0.5}
+            on_release: app.on_password_entered()
+            #on_release: root.check_password(password_input.text)
+            opacity: 0
+            disabled: True
+
+    
+
+<FirstPathScreen>:
+    name: "first"
+    MDBoxLayout:
+        orientation: 'vertical'
+        MDLabel:
+            text: "Access Denied!"
+            halign: 'center'
+            theme_text_color: "Error"
+            font_style: "H5"
+
+        MDLabel:
+            text: "Incorrect password."
+            halign: 'center'
+            theme_text_color: "Secondary"
+            font_style: "H6"
+
+
+<SecondPathScreen>:
+    name: "second"
+
+    MDBoxLayout:
+        orientation: "vertical"
+
+        #MDTopAppBar:
+            #title: "Second Path"
+            #left_action_items: [["arrow-left", lambda x: setattr(app.root, 'current', 'main')]]
+
+        MDFloatLayout:
+            MDLabel:
+                id: welcome_text
+                text: "Advanced driver-assistance system"
+                font_style: "H3"
+                bold: True
+                pos_hint: {"center_x": 0.5, "center_y": 0.9}
+                theme_text_color: "Custom"
+                text_color: 0.2, 0.2, 0.2, 1
+                halign: 'center'
+
+
+            MDRaisedButton:
+                text: "Music"
+                size_hint: 0.18, 0.18
+                pos_hint: {"center_x": 0.1, "center_y": 0.5}
+                on_release: app.root.current = "sub1"
+
+            MDRaisedButton:
+                text: "FOTA"
+                size_hint: 0.18, 0.18
+                pos_hint: {"center_x": 0.3, "center_y": 0.5}
+                on_release: app.root.current = "sub2"
+
+            MDRaisedButton:
+                text: "ADAS"
+                size_hint: 0.18, 0.18
+                pos_hint: {"center_x": 0.5, "center_y": 0.5}
+                on_release: app.root.current = "sub3"
+
+            MDRaisedButton:
+                text: "Weather"
+                size_hint: 0.18, 0.18
+                pos_hint: {"center_x": 0.7, "center_y": 0.5}
+                on_release: app.root.current = "sub4"
+
+            MDRaisedButton:
+                text: "SOS"
+                size_hint: 0.18, 0.18
+                pos_hint: {"center_x": 0.9, "center_y": 0.5}
+                on_release: app.root.current = "sub5"
+
+
+<Subscreen1>:
+    name: "sub1"
+    MDBoxLayout:
+        orientation: "vertical"
+        MDTopAppBar:
+            title: "Back to MainWindow"
+            left_action_items: [["arrow-left", lambda x: setattr(app.root, 'current', 'second')]]
+        MDLabel:
+            text: "Subscreen 1"
+            halign: "center"
+           
+
+<Subscreen2>:
+    name: "sub2"
+    MDBoxLayout:
+        orientation: "vertical"
+        MDTopAppBar:
+            title: "Back to MainWindow"
+            left_action_items: [["arrow-left", lambda x: setattr(app.root, 'current', 'second')]]
+            
+        BoxLayout:
+            orientation: "vertical"
+            padding: 20
+            spacing: 15
+
+            MDLabel:
+                text: "Firmware Updater"
+                halign: "center"
+                font_style: "H3"
+                bold: True
+                theme_text_color: "Custom"
+                text_color: "#00897B"  #other colors: "#00695C" or   "#26A69A"
+                halign: 'center'
+
+            MDSeparator:
+
+            MDLabel:
+                id: current_label
+                text: "Current Version: Loading..."
+                halign: "center"
+                theme_text_color: "Secondary"
+
+            MDLabel:
+                id: latest_label
+                text: "Latest Version: Loading..."
+                halign: "center"
+                theme_text_color: "Secondary"
+
+            MDLabel:
+                id: delayed_label
+                text: "Delayed Version: Loading..."
+                halign: "center"
+                theme_text_color: "Hint"
+
+            MDSeparator:
+
+            MDLabel:
+                id: status_label
+                text: "Status: Waiting..."
+                halign: "center"
+                theme_text_color: "Custom"
+                text_color: "#26A69A"
+
+            Widget:
+
+            MDRoundFlatIconButton:
+                icon: "magnify"
+                icon_size: "24sp"
+                size_hint: 0.3, 0.5
+                text: "Check for Update"
+                pos_hint: {"center_x": 0.5}
+                on_release: root.check_for_update()
+
+            MDRoundFlatIconButton:
+                icon: "fire"
+                icon_size: "24sp"
+                size_hint: 0.3, 0.5
+                text: "Burn Update"
+                pos_hint: {"center_x": 0.5}
+                on_release: root.burn_update()
+
+            MDRoundFlatIconButton:
+                icon: "skip-forward"
+                icon_size: "24sp"
+                size_hint: 0.3, 0.5
+                text: "Skip Update"
+                pos_hint: {"center_x": 0.5}
+                on_release: root.skip_update()
+
+            Widget:
+
+            MDSeparator:
+
+            MDLabel:
+                id: update_label1
+                text: "Check for update..."
+                halign: "center"
+                theme_text_color: "Custom"
+                text_color: "#00695C"
+            
+            MDLabel:
+                id: update_label2
+                text: "Last update ..."
+                halign: "center"
+                theme_text_color: "Custom"
+                text_color: "#00695C"
+
+<Subscreen3>:
+    name: "sub3"
+    MDBoxLayout:
+        orientation: "vertical"
+        MDTopAppBar:
+            title: "Back to MainWindow"
+            left_action_items: [["arrow-left", lambda x: setattr(app.root, 'current', 'second')]]
+        BoxLayout:
+            orientation: 'horizontal'
+            
+            # Fixed Left Navigation Panel
+            BoxLayout:
+                id: nav_panel
+                orientation: 'vertical'
+                size_hint_x: None
+                width: dp(280)
+                padding: [dp(8), dp(16)]
+                spacing: dp(8)
+                md_bg_color: app.theme_cls.primary_dark
+                
+                # App Title
+                MDLabel:
+                    text: "ADAS System"
+                    font_style: "H5"
+                    halign: "center"
+                    size_hint_y: None
+                    height: dp(40)
+                    theme_text_color: "Custom"
+                    text_color: 1, 0, 0, 1
+                
+                # Navigation Buttons
+                ScrollView:
+                    BoxLayout:
+                        orientation: 'vertical'
+                        size_hint_y: None
+                        height: self.minimum_height
+                        spacing: dp(8)
+                        padding: [dp(8), 0]
+                        
+                        MDRectangleFlatIconButton:
+                            text: "Drowsiness Detection"
+                            icon: "sleep"
+                            size_hint: 1, 0.5
+                            on_release: 
+                                root.ids.screen_manager.current = "drowsy"
+                                self.md_bg_color = app.theme_cls.accent_color
+                            
+                        
+                        MDRectangleFlatIconButton:
+                            text: "Sign Recognition"
+                            icon: "traffic-light"
+                            size_hint: 1, 0.5
+                            on_release: 
+                                root.ids.screen_manager.current = "sign"
+                                self.md_bg_color = app.theme_cls.accent_color
+                        
+                        MDRectangleFlatIconButton:
+                            text: "Lane Detection"
+                            icon: "road-variant"
+                            size_hint: 1, 0.5
+                            on_release: 
+                                root.ids.screen_manager.current = "lane"
+                                self.md_bg_color = app.theme_cls.accent_color
+                        
+                        MDRectangleFlatIconButton:
+                            text: "Blind Spot Warning"
+                            icon: "eye-off-outline"
+                            size_hint: 1, 0.5
+                            on_release: 
+                                root.ids.screen_manager.current = "blind_spot"
+                                self.md_bg_color = app.theme_cls.accent_color
+                        
+                        MDRectangleFlatIconButton:
+                            text: "Collision Avoidance"
+                            icon: "car-brake-alert"
+                            size_hint: 1, 0.5
+                            on_release: 
+                                root.ids.screen_manager.current = "collision_avoidance"
+                                self.md_bg_color = app.theme_cls.accent_color
+                
+                # Bottom spacer
+                Widget:
+            
+            # Right Content Area
+            ScreenManager:
+                id: screen_manager
+                
+                Drowsy:
+                    name: "drowsy"
+                
+                Sign:
+                    name: "sign"
+                
+                Lane:
+                    name: "lane"
+                
+                BlindSpot:
+                    name: "blind_spot"
+                
+                CollisionAvoidance:
+                    name: "collision_avoidance"
+
+<Subscreen4>:
+    name: "sub4"
+    md_bg_color: 1, 1, 1, 1
+
+    MDBoxLayout:
+        orientation: "vertical"
+        MDTopAppBar:
+            title: "Back to MainWindow"
+            left_action_items: [["arrow-left", lambda x: setattr(app.root, 'current', 'second')]]
+        MDBoxLayout:
+            orientation: "vertical"
+            spacing: "20dp"
+            padding: "20dp"
+            pos_hint: {"center_x": 0.5, "center_y": 0.5}
+            size_hint: 0.95, None
+            height: self.minimum_height
+
+            MDLabel:
+                id: city_label
+                text: "Alexandria"
+                halign: "center"
+                font_style: "H4"
+                theme_text_color: "Primary"
+
+            MDLabel:
+                id: datetime_label
+                text: "Loading..."
+                halign: "center"
+                font_style: "Subtitle2"
+                theme_text_color: "Secondary"
+
+            MDCard:
+                orientation: "horizontal"
+                padding: "16dp"
+                radius: [12,]
+                elevation: 4
+                md_bg_color: 0.95, 0.95, 1, 1
+                size_hint_y: None
+                height: "80dp"
+
+                MDIcon:
+                    icon: "thermometer"
+                    halign: "center"
+                    theme_text_color: "Primary"
+
+                MDLabel:
+                    id: temp_label
+                    text: "Temperature: ..."
+                    halign: "left"
+                    font_style: "H6"
+
+            MDCard:
+                orientation: "horizontal"
+                padding: "16dp"
+                radius: [12,]
+                elevation: 4
+                md_bg_color: 0.95, 1, 0.95, 1
+                size_hint_y: None
+                height: "80dp"
+
+                MDIcon:
+                    icon: "weather-cloudy"
+                    halign: "center"
+                    theme_text_color: "Primary"
+
+                MDLabel:
+                    id: desc_label
+                    text: "Weather: ..."
+                    halign: "left"
+                    font_style: "H6"
+
+            MDCard:
+                orientation: "horizontal"
+                padding: "16dp"
+                radius: [12,]
+                elevation: 4
+                md_bg_color: 1, 0.95, 0.95, 1
+                size_hint_y: None
+                height: "80dp"
+
+                MDIcon:
+                    icon: "weather-windy"
+                    halign: "center"
+                    theme_text_color: "Primary"
+
+                MDLabel:
+                    id: wind_label
+                    text: "Wind Speed: ..."
+                    halign: "left"
+                    font_style: "H6"
+
+            MDCard:
+                orientation: "horizontal"
+                padding: "16dp"
+                radius: [12,]
+                elevation: 4
+                md_bg_color: 0.95, 1, 1, 1
+                size_hint_y: None
+                height: "80dp"
+
+                MDIcon:
+                    icon: "eye-outline"
+                    halign: "center"
+                    theme_text_color: "Primary"
+
+                MDLabel:
+                    id: vis_label
+                    text: "Visibility: ..."
+                    halign: "left"
+                    font_style: "H6"
+
+            MDLabel:
+                id: warning_label
+                text: ""
+                halign: "center"
+                font_style: "H6"
+                theme_text_color: "Error"
+
+            MDRaisedButton:
+                text: "Refresh"
+                pos_hint: {"center_x": 0.5}
+                on_release: root.manual_refresh()
+
+
+<Subscreen5>:
+    name: "sub5"
+    MDBoxLayout:
+        orientation: "vertical"
+        MDTopAppBar:
+            title: "Back to MainWindow"
+            left_action_items: [["arrow-left", lambda x: setattr(app.root, 'current', 'second')]]
+        MDFloatLayout:
+            md_bg_color: 0.98, 0.98, 0.98, 1  # خلفية فاتحة
+
+            # العنوان الرئيسي
+            MDLabel:
+                text: "Emergency Assistance"
+                halign: "center"
+                pos_hint: {"center_x": 0.5, "center_y": 0.9}
+                font_style: "H3"
+                bold: True
+                theme_text_color: "Custom"
+                text_color: 0.2, 0.2, 0.2, 1
+                size_hint_y: None
+                height: self.texture_size[1]
+
+            # وصف التطبيق
+            MDLabel:
+                text: "For sending alert to all your contacts"
+                halign: "center"
+                pos_hint: {"center_x": 0.5, "center_y": 0.7}
+                font_style: "Body1"
+                theme_text_color: "Secondary"
+                italic: True
+                size_hint_y: None
+                height: self.texture_size[1]
+
+            # زر SOS الرئيسي
+            MDRaisedButton:
+                text: "SOS Emergency"
+                icon: "alert-circle-outline"
+                pos_hint: {"center_x": 0.5, "center_y": 0.6}
+                size_hint: 0.7, 0.1
+                font_size: "20sp"
+                md_bg_color: 0.9, 0.1, 0.1, 1
+                text_color: 1, 1, 1, 1
+                icon_color: 1, 1, 1, 1
+                line_color: 0.7, 0, 0, 1 
+                on_release:  root.send_emergency_messages()
+
+            # فاصل بديل بدون MDSeparator
+            MDLabel:
+                text: "_" * 50  # خط أفقي بدائي
+                halign: "center"
+                pos_hint: {"center_x": 0.5, "center_y": 0.52}
+                theme_text_color: "Hint"
+                font_style: "Caption"
+                size_hint_y: None
+                height: "20dp"
+
+            # عنوان الاتصالات السريعة
+            MDLabel:
+                text: "Quick Contact Options:"
+                pos_hint: {"center_x": 0.5, "center_y": 0.45}
+                font_style: "Subtitle1"
+                bold: True
+                theme_text_color: "Custom"
+                text_color: 0.3, 0.3, 0.3, 1
+                size_hint_y: None
+                height: self.texture_size[1]
+
+            # أزرار الاتصال السريع
+            MDGridLayout:
+                cols: 3
+                rows: 1
+                size_hint: 0.9, 0.2
+                pos_hint: {"center_x": 0.5, "center_y": 0.3}
+                spacing: "10dp"
+                padding: "10dp"
+
+                MDRoundFlatIconButton:
+                    text: "Ambulance"
+                    icon: "ambulance"
+                    on_release:  root.call_ambulance()
+                    md_bg_color: 0.95, 0.95, 1, 1
+                    text_color: 0.1, 0.1, 0.4, 1
+                    icon_color: 0.1, 0.1, 0.4, 1
+                    line_color: 0.7, 0.7, 1, 1
+                    size_hint_x: 1
+
+                MDRoundFlatIconButton:
+                    text: "Family"
+                    icon: "account-heart"
+                    on_release:  root.call_family()
+                    md_bg_color: 0.95, 1, 0.95, 1
+                    text_color: 0.1, 0.4, 0.1, 1
+                    icon_color: 0.1, 0.4, 0.1, 1
+                    line_color: 0.7, 1, 0.7, 1
+                    size_hint_x: 1
+
+                MDRoundFlatIconButton:
+                    text: "Friend"
+                    icon: "account-multiple"
+                    on_release:  root.call_friend()
+                    md_bg_color: 1, 0.95, 0.95, 1
+                    text_color: 0.4, 0.1, 0.1, 1
+                    icon_color: 0.4, 0.1, 0.1, 1
+                    line_color: 1, 0.7, 0.7, 1
+                    size_hint_x: 1
+
+
+<Drowsy>:
+    AnchorLayout:
+        anchor_y: "top"
+        MDBoxLayout:
+            orientation: "vertical"
+            padding: dp(16)
+            spacing: dp(16)
+            size_hint_y: None
+            height: self.minimum_height
+
+            MDLabel:
+                text: "Drowsiness Detection"
+                halign: "center"
+                font_style: "H4"
+                size_hint_y: None
+                height: self.texture_size[1]
+                pos_hint: {"top": 1}
+
+
+            MDCard:
+                orientation: 'vertical'
+                padding: dp(20)
+                spacing: dp(20)
+                size_hint: 0.95, None
+                height: self.minimum_height
+                pos_hint: {"center_x": 0.5}
+                #elevation: 10
+                radius: [20,]
+                md_bg_color: (0.678, 0.847, 0.902, 0.3)  # Light blue color (RGB: 173, 216, 230)
+
+                # --- Drowsiness Alert Section ---
+                BoxLayout:
+                    orientation: 'horizontal'
+                    spacing: dp(12)
+                    size_hint_y: None
+                    height: dp(60)
+
+                    Image:
+                        source: "img/drowsy.png"
+                        size_hint: None, None
+                        size: dp(40), dp(40)
+
+                    MDLabel:
+                        id: drowsy_warning
+                        text: "No drowsiness detected."
+                        halign: "left"
+                        valign: "middle"
+                        theme_text_color: "Custom"
+                        text_color: 0, 1, 0, 1
+                        font_style: "Subtitle1"
+
+                MDSeparator:
+                    height: dp(1)
+
+                # --- Yawning Alert Section ---
+                BoxLayout:
+                    orientation: 'horizontal'
+                    spacing: dp(12)
+                    size_hint_y: None
+                    height: dp(60)
+
+                    Image:
+                        source: "img/yawn.png"
+                        size_hint: None, None
+                        size: dp(40), dp(40)
+
+                    MDLabel:
+                        id: yawning_warning
+                        text: "No yawning detected."
+                        halign: "left"
+                        valign: "middle"
+                        theme_text_color: "Custom"
+                        text_color: 0, 1, 0, 1
+                        font_style: "Subtitle1"
+                MDSeparator:
+                    height: dp(1)
+
+                # --- head position Alert Section ---
+                BoxLayout:
+                    orientation: 'horizontal'
+                    spacing: dp(12)
+                    size_hint_y: None
+                    height: dp(60)
+
+                    Image:
+                        source: "img/headpos.png"
+                        size_hint: None, None
+                        size: dp(40), dp(40)
+
+                    MDLabel:
+                        id: headPosition_warning
+                        text: "head position is fine."
+                        halign: "left"
+                        valign: "middle"
+                        theme_text_color: "Custom"
+                        text_color: 0, 1, 0, 1
+                        font_style: "Subtitle1"
+                MDSeparator:
+                    height: dp(1)
+
+                # --- danger Alert Section ---
+                BoxLayout:
+                    orientation: 'horizontal'
+                    spacing: dp(12)
+                    size_hint_y: None
+                    height: dp(60)
+
+                    Image:
+                        source: "img/danger.png"
+                        size_hint: None, None
+                        size: dp(40), dp(40)
+
+                    MDLabel:
+                        id: danger_warning
+                        text: "no danger is defined."
+                        halign: "left"
+                        valign: "middle"
+                        theme_text_color: "Custom"
+                        text_color: 0, 1, 0, 1
+                        font_style: "Subtitle1"
+                # --- Blinking Alert Icon (centered) ---
+                MDBoxLayout:
+                    orientation: "horizontal"
+                    size_hint_y: None
+                    height: dp(70)
+                    pos_hint: {"center_x": 0.5}  # Keep it horizontally centered
+                    padding: dp(10)
+                    spacing: dp(10)
+                    
+                    # Use a FloatLayout to precisely control the positioning of the icon
+                    FloatLayout:
+                        size_hint: 1, 1
+                        
+                        MDIcon:
+                            id: alert_icon
+                            icon: "alert"
+                            font_size: dp(150)
+                            halign: "center"
+                            theme_text_color: "Custom"
+                            text_color: 1, 0, 0, 0  # hidden initially
+                            size_hint: None, None  # Allow custom sizing
+                            size: dp(150), dp(150)  # Set icon size
+                            pos_hint: {"right": 1, "bottom": 0}  # Position it at the bottom-right corner
+
+<Sign>:
+    name: "sign"
+    AnchorLayout:
+        anchor_y: "top"
+        MDBoxLayout:
+            orientation: "vertical"
+            padding: dp(16)
+            spacing: dp(16)
+            size_hint_y: None
+            height: self.minimum_height
+
+            MDLabel:
+                text: "Sign Detection"
+                halign: "center"
+                font_style: "H4"
+                size_hint_y: None
+                height: self.texture_size[1]
+                pos_hint: {"top": 1}
+
+            MDCard:
+                orientation: 'vertical'
+                padding: dp(20)
+                spacing: dp(20)
+                size_hint: 0.95, None
+                height: self.minimum_height
+                pos_hint: {"center_x": 0.5}
+                elevation: 10
+                radius: [20,]
+                md_bg_color: (0.678, 0.847, 0.902, 0.3)  # Light blue, semi-transparent
+
+                BoxLayout:
+                    orientation: 'horizontal'
+                    spacing: dp(10)
+                    size_hint_y: None
+                    height: dp(200)
+
+                    BoxLayout:
+                        orientation: 'vertical'
+                        spacing: dp(5)
+                        Label:
+                            text: "Sign 1"
+                            halign: "center"
+                        Image:
+                            id: sign1
+                            source: ""
+                            allow_stretch: True
+                            keep_ratio: True
+                        Label:
+                            id: desc1
+                            text: ""
+                            halign: "center"
+
+                    BoxLayout:
+                        orientation: 'vertical'
+                        spacing: dp(5)
+                        Label:
+                            text: "Sign 2"
+                            halign: "center"
+                        Image:
+                            id: sign2
+                            source: ""
+                            allow_stretch: True
+                            keep_ratio: True
+                        Label:
+                            id: desc2
+                            text: ""
+                            halign: "center"
+
+                    BoxLayout:
+                        orientation: 'vertical'
+                        spacing: dp(5)
+                        Label:
+                            text: "Sign 3"
+                            halign: "center"
+                        Image:
+                            id: sign3
+                            source: ""
+                            allow_stretch: True
+                            keep_ratio: True
+                        Label:
+                            id: desc3
+                            text: ""
+                            halign: "center"
+
+                MDLabel:
+                    id: sign_status
+                    text: "Waiting for signs..."
+                    halign: "center"
+                    theme_text_color: "Secondary"
+                    size_hint_y: None
+                    height: self.texture_size[1]
+
+<Lane>:
+    name: "lane"
+    AnchorLayout:
+        anchor_y: "top"
+        
+        MDBoxLayout:
+            orientation: "vertical"
+            padding: dp(16)
+            spacing: dp(16)
+            size_hint_y: None
+            height: self.minimum_height
+
+            MDLabel:
+                text: "Lane Detection"
+                halign: "center"
+                font_style: "H4"
+                size_hint_y: None
+                height: self.texture_size[1]
+                pos_hint: {"top": 1}
+
+            MDCard:
+                orientation: 'vertical'
+                padding: dp(20)
+                spacing: dp(20)
+                size_hint: 0.95, None
+                height: dp(300)
+                pos_hint: {"center_x": 0.5}
+                #elevation: 10
+                radius: [20,]
+                md_bg_color: (0.678, 0.847, 0.902, 0.1)
+
+                # Road background with car and question mark
+                RelativeLayout:
+                    size_hint: 1, 1
+                    Image:
+                        id: lane_background
+                        source: "img/road.png"
+                        allow_stretch: True  # Keep this for backward compatibility
+                        keep_ratio: True     # Keep this for backward compatibility
+                        fit_mode: "contain"  # Add this new property
+                        size_hint: 1, 1
+
+                    Image:
+                        id: car
+                        source: "img/car.png"
+                        size_hint: None, None
+                        size: dp(80), dp(80)
+                        pos_hint: {"center_x": 0.5, "center_y": 0.5}
+                    
+                    # --- Blinking Alert Icon (centered) ---
+                    MDBoxLayout:
+                        orientation: "horizontal"
+                        size_hint_y: None
+                        height: dp(70)
+                        pos_hint: {"center_x": 0.5}  # Keep it horizontally centered
+                        padding: dp(10)
+                        spacing: dp(10)
+                        
+                        # Use a FloatLayout to precisely control the positioning of the icon
+                        FloatLayout:
+                            size_hint: 1, 1
+                            
+                            MDIcon:
+                                id: alert_icon
+                                icon: "alert"
+                                font_size: dp(150)
+                                halign: "center"
+                                theme_text_color: "Custom"
+                                text_color: 1, 0, 0, 0  # hidden initially
+                                size_hint: None, None  # Allow custom sizing
+                                size: dp(150), dp(150)  # Set icon size
+                                pos_hint: {"right": 1, "bottom": 0}  # Position it at the bottom-right corner
+        
+                MDLabel:
+                    id: lane_status
+                    text: "Waiting for lane data..."
+                    halign: "center"
+                    theme_text_color: "Custom"
+                    size_hint_y: None
+                    height: self.texture_size[1]
+                    text_color: (1, 1, 1, 1)
+
+
+<CollisionAvoidance>:
+    name: "collision_Avoidance"
+    AnchorLayout:
+        anchor_y: "top"
+        
+        MDBoxLayout:
+            orientation: "vertical"
+            padding: dp(16)
+            spacing: dp(16)
+            size_hint_y: None
+            height: self.minimum_height
+
+            MDLabel:
+                text: "Collision Avoidance"
+                halign: "center"
+                font_style: "H4"
+                size_hint_y: None
+                height: self.texture_size[1]
+                pos_hint: {"top": 1}
+
+            MDCard:
+                orientation: 'vertical'
+                padding: dp(20)
+                spacing: dp(20)
+                size_hint: 0.95, None
+                height: dp(300)
+                pos_hint: {"center_x": 0.5}
+                #elevation: 10
+                radius: [20,]
+                md_bg_color: (0.678, 0.847, 0.902, 0.1)
+
+                # Road background with car and question mark
+                RelativeLayout:
+                    size_hint: 1, 1
+                    Image:
+                        id: collision_background
+                        source: "img/road.png"
+                        allow_stretch: True  # Keep this for backward compatibility
+                        keep_ratio: True     # Keep this for backward compatibility
+                        fit_mode: "contain"  # Add this new property
+                        size_hint: 1, 1
+
+                    Image:
+                        id: car
+                        source: "img/car.png"
+                        size_hint: None, None
+                        size: dp(80), dp(80)
+                        pos_hint: {"center_x": 0.5, "center_y": 0.5}
+                    
+                    # --- Blinking Alert Icons
+ 
+                    FloatLayout:
+                        MDIcon:
+                            id: front_icon
+                            icon: "arrow-up-bold" #
+                            theme_text_color: "Custom"
+                            text_color: 1, 0, 0, 0  # hidden by default
+                            font_size: dp(80)
+                            pos_hint: {"center_x": 0.5, "top": 1}
+
+                        MDIcon:
+                            id: back_icon
+                            icon: "arrow-down-bold"
+                            theme_text_color: "Custom"
+                            text_color: 1, 0, 0, 0
+                            font_size: dp(80)
+                            pos_hint: {"center_x": 0.5, "y": 0}
+        
+                MDLabel:
+                    id: collision_status
+                    text: "waiting for collision avoidance message .."
+                    halign: "center"
+                    theme_text_color: "Custom"
+                    size_hint_y: None
+                    height: self.texture_size[1]
+                    #text_color: (1, 1, 1, 1)
+
+
+ 
+
+
+<BlindSpot>:
+    name: "blind_spot"
+    AnchorLayout:
+        anchor_y: "top"
+        
+        MDBoxLayout:
+            orientation: "vertical"
+            padding: dp(16)
+            spacing: dp(16)
+            size_hint_y: None
+            height: self.minimum_height
+
+            MDLabel:
+                text: "Blind Spot"
+                halign: "center"
+                font_style: "H4"
+                size_hint_y: None
+                height: self.texture_size[1]
+                pos_hint: {"top": 1}
+
+            MDCard:
+                orientation: 'vertical'
+                padding: dp(20)
+                spacing: dp(20)
+                size_hint: 0.95, None
+                height: dp(300)
+                pos_hint: {"center_x": 0.5}
+                #elevation: 10
+                radius: [20,]
+                md_bg_color: (0.678, 0.847, 0.902, 0.1)
+
+                # Road background with car and question mark
+                RelativeLayout:
+                    size_hint: 1, 1
+                    Image:
+                        id: collision_background
+                        source: "img/road.png"
+                        allow_stretch: True  # Keep this for backward compatibility
+                        keep_ratio: True     # Keep this for backward compatibility
+                        fit_mode: "contain"  # Add this new property
+                        size_hint: 1, 1
+
+                    Image:
+                        id: car
+                        source: "img/car2.png"
+                        size_hint: None, None
+                        size: dp(80), dp(80)
+                        pos_hint: {"center_x": 0.5, "center_y": 0.5}
+                    
+                    # --- Blinking Alert Icons
+ 
+                    FloatLayout: 
+                        MDIcon:
+                            id: right_icon
+                            icon: "eye-off-outline"
+                            theme_text_color: "Custom"
+                            text_color: 1, 0, 0, 0
+                            font_size: dp(80)
+                            pos_hint: {"right": 1, "center_y": 0.5}
+
+                        MDIcon:
+                            id: left_icon
+                            icon: "eye-off-outline"
+                            theme_text_color: "Custom"
+                            text_color: 1, 0, 0, 0
+                            font_size: dp(80)
+                            pos_hint: {"x": 0, "center_y": 0.5}
+     
+                MDLabel:
+                    id: bsw_status
+                    text: "NO Blind Spot Message .."
+                    halign: "center"
+                    theme_text_color: "Custom"
+                    size_hint_y: None
+                    height: self.texture_size[1]
+                    #text_color: (1, 1, 1, 1)
+
+
+ 
+
+
+
