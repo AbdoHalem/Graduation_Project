@@ -1,4 +1,4 @@
-name: Docker Image CI for sign feature
+name: Docker Image CI for sign feature using docker compose
 
 on:
   workflow_dispatch:
