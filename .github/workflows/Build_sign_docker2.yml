@@ -36,4 +36,4 @@ jobs:
           file: AI_Features/Docker/Sign_Feature/DockerFile    # path to Dockerfile
           platforms: linux/arm64,linux/amd64                           # target architecture
           push: true
-          tags: halem10/sign_publisher:1.0                    # your Docker Hub repo:tag
+          tags: halem10/sign_publisher:1.1                    # your Docker Hub repo:tag
