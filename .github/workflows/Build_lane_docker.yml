@@ -27,7 +27,7 @@ jobs:
         docker login -u halem10 -p ${{ secrets.DOCKER_HUB_TOKEN }}
         
     - name: Build and push the Docker image of lane_detection for arm64
-      run: docker buildx build --platform linux/arm64,linux/amd64 -t halem10/lane_publisher:1.0 --push -f AI_Features/Docker/lane_detection/DockerFile AI_Features/Docker/lane_detection/
+      run: docker buildx build --platform linux/arm64,linux/amd64 -t halem10/lane_publisher:1.1 --push -f AI_Features/Docker/lane_detection/DockerFile AI_Features/Docker/lane_detection/
     
       
 
