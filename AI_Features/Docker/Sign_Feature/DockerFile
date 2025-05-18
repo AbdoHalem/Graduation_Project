@@ -36,7 +36,9 @@ COPY requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application code
-COPY DockerFile Sign_Publisher_V2.2.py detection_model recognition_model  /app/
+COPY DockerFile Sign_Publisher_V2.2.py /app/
+COPY detection_model /app/detection_model
+COPY recognition_model /app/recognition_model
 
 # Expose the port the app runs on
 EXPOSE 6000
