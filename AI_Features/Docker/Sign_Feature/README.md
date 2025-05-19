@@ -28,4 +28,6 @@ ONNX stands for Open Neural Network Exchange. It is an open standard format desi
 
 #### The CNN recognition model using dynamic quantization from floating-point precision to INT8 precision.
 
-
+On **DockerHub**, you will find 2 images:
+1- halem10/sign_publisher:1.1 for receiving frames via socket from RPI4 host
+2- halem10/sign_publisher:1.2 for receiving frames from RAM through IPC

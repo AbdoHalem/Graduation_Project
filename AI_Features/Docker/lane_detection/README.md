@@ -8,4 +8,8 @@ If you just want the original training images with no flips or rotations (downsi
 ## Software Requirements
 You can use [this conda environment file](lane_environment.yml). In the command line, use `conda env create -f lane_environment.yml` and then `source activate lane_environment` (or just `activate` with the environment name on Windows) to use the environment.
 
-Notice that the req_2.txt file is the one we use to install the libraries on RPI3
+Notice that the req_2.txt file is the one we use to install the libraries on RPI4
+
+On **DockerHub**, you will find 2 images:
+1- halem10/lane_publisher:1.0 for receiving frames via socket from RPI4 host
+2- halem10/lane_publisher:1.1 for receiving frames from RAM through IPC
