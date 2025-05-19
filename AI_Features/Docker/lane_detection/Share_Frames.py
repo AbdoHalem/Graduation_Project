@@ -49,6 +49,8 @@ try:
         if not ret:
             break
         #cv2.imshow("Pi camera", frame)
+        #if cv2.waitKey(1) & 0xFF == ord('q'):
+        #    break
         shm.seek(0)
         shm.write(frame.tobytes())
         time.sleep(0.04)  # Adjust the sleep time as needed
