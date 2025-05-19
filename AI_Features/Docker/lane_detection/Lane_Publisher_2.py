@@ -31,7 +31,6 @@ input_type   = 'image'
 input_source = None
 # ────────────────────────────────────────────────────────────────────────────────
 
-# Socket settings (for image-over-socket mode)
 # Shared‑memory config (must match your publisher)
 SHM_PATH    = "/dev/shm/frame_buf"
 W, H, C     = 640, 480, 3
@@ -81,11 +80,6 @@ class Lanes():
         self.recent_fit = []
         self.avg_fit = None
 
-# Create the TFLite interpreter and allocate tensors
-interpreter = tflite.Interpreter(model_path="CNN_model.tflite")  # Update with your quantized model path
-interpreter.allocate_tensors()
-input_details = interpreter.get_input_details()
-output_details = interpreter.get_output_details()
 
 def predict_lane_tflite(image):
     """
@@ -169,6 +163,12 @@ def road_lines_status(image, update_model=True):
 
     return status
 
+# Create the TFLite interpreter and allocate tensors
+interpreter = tflite.Interpreter(model_path="CNN_model.tflite")  # Update with your quantized model path
+interpreter.allocate_tensors()
+input_details = interpreter.get_input_details()
+output_details = interpreter.get_output_details()
+
 if __name__ == '__main__':
     # Create a Lanes object for temporal smoothing
     lanes = Lanes()
@@ -189,13 +189,13 @@ if __name__ == '__main__':
                 ret, frame = cap.read()
                 if not ret:
                     break
-            else:  # 'image' over socket
+            else:
                 # shared‑mem image mode
                 frame = frame_view  # zero‑copy NumPy view
 
             ''' Detect the lane every 2 frames not at each frame
             every 5th frame, update model; else reuse avg'''
-            update = (frame_counter % 2 == 0)
+            update = (frame_counter % 1 == 0)
             status = road_lines_status(frame, update_model=update)
 
             # publish only on change
