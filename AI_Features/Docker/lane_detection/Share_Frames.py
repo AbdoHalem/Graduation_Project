@@ -51,7 +51,7 @@ try:
         #cv2.imshow("Pi camera", frame)
         shm.seek(0)
         shm.write(frame.tobytes())
-        time.sleep(0.4)
+        time.sleep(0.04)  # Adjust the sleep time as needed
 
 finally:
     cap.release()
