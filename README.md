@@ -153,7 +153,6 @@ Key aspects:
 
   * `AutoParkingHandler`
   * `ParkCar`
-  * `MotorControl`
 * **Operation**:
 
   * Searches for a valid parking space using side-mounted ultrasonic sensors.
