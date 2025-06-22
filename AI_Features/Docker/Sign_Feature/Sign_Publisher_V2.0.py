@@ -1,3 +1,5 @@
+'''This code uses socket programmming to receive frames from the python script.
+'''
 import os, time, sys
 import numpy as np
 import cv2
