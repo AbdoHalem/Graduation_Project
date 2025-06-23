@@ -1,4 +1,7 @@
-import os, time, sys
+'''This code uses interprocess communication to receive frames from the python script via RAM buffer.
+   It runs object detection + recognition and publishes any new sign detections over MQTT (HiveMQ Cloud).
+'''
+import os, time, sys, ssl
 import numpy as np
 import cv2
 import tflite_runtime.interpreter as tflite
@@ -12,31 +15,18 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "-1"   # Disable GPU
 sys.modules['np._core.multiarray'] = np.core.multiarray
 
 # MQTT Configuration
-MQTT_BROKER = "test.mosquitto.org"
-MQTT_PORT = 1883
+MQTT_BROKER = "46ecfaf93a7b4d4b87b953f6cdc35b6d.s1.eu.hivemq.cloud"
+BROKER_USERNAME = "ADAS_GP_25"
+BROKER_PASSWORD = "ADAS_Gp_25"
+MQTT_PORT = 8883
 MQTT_TOPIC = "ADAS_GP/sign"
-# shared flag to check the feature controlled status from the GUI
-status = "on"
 
-def on_connect(client, userdata, flags, rc, properties=None):
-    print("MQTT connected, subscribing to", MQTT_TOPIC)
-    client.subscribe(MQTT_TOPIC)
-
-def on_message(client, userdata, msg):
-    global status
-    text = msg.payload.decode("utf-8", errors="ignore").strip().lower()
-    print(f"[MQTT ←] {text}")
-    if text in ("on","off"):
-        status = text
-        print(f"→ status set to {status}")
-
-# 1 Initialize a persistent MQTT client
-mqtt_client = mqtt.Client(callback_api_version=mqtt.CallbackAPIVersion.VERSION2)
-mqtt_client.on_connect = on_connect
-mqtt_client.on_message = on_message
+# initialize MQTT client with TLS + auth
+mqtt_client = mqtt.Client()
+mqtt_client.username_pw_set(BROKER_USERNAME, BROKER_PASSWORD)
+mqtt_client.tls_set(tls_version=ssl.PROTOCOL_TLS)
 mqtt_client.connect(MQTT_BROKER, MQTT_PORT, keepalive=60)
 mqtt_client.loop_start()
-time.sleep(1)   # give on_connect/on_message a moment to run
 
 # --- SHM CONFIG (must match sender) ---
 SHM_PATH    = "/dev/shm/frame_buf"
@@ -303,12 +293,7 @@ if __name__ == "__main__" :
     frame_counter = 0           # Count processed frames
 
     try:
-        while True:
-            # only run detection when status == "on"
-            if status != "on":
-                # you can sleep a bit to avoid busy‐spin
-                time.sleep(0.5); continue
-            
+        while True:            
             if input_type in ['video', 'camera']:
                 if not cap.isOpened():
                     print("Error: Unable to open the input source.")
