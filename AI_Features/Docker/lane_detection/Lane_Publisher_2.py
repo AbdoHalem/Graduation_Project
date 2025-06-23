@@ -1,18 +1,35 @@
+'''This code uses inter-process communication to receive shared frames from RPI4 host from RAM
+'''
 import numpy as np
 import cv2
-import time, os, glob, mmap, struct
+import time, os, mmap, ssl
 import tflite_runtime.interpreter as tflite
 import paho.mqtt.client as mqtt
 
 # MQTT Configuration
-MQTT_BROKER = "test.mosquitto.org"
-MQTT_PORT = 1883
+MQTT_BROKER = "46ecfaf93a7b4d4b87b953f6cdc35b6d.s1.eu.hivemq.cloud"
+BROKER_USERNAME = "ADAS_GP_25"
+BROKER_PASSWORD = "ADAS_Gp_25"
+MQTT_PORT = 8883
 MQTT_TOPIC = "ADAS_GP/lane"
 
-# 1️⃣ Initialize a persistent MQTT client
+# initialize MQTT client with TLS + auth
 mqtt_client = mqtt.Client()
+mqtt_client.username_pw_set(BROKER_USERNAME, BROKER_PASSWORD)
+mqtt_client.tls_set(tls_version=ssl.PROTOCOL_TLSv1_2)
+mqtt_client.tls_insecure_set(True)
 mqtt_client.connect(MQTT_BROKER, MQTT_PORT, keepalive=60)
 mqtt_client.loop_start()
+
+# # MQTT Configuration
+# MQTT_BROKER = "test.mosquitto.org"
+# MQTT_PORT = 1883
+# MQTT_TOPIC = "ADAS_GP/lane"
+
+# # 1️⃣ Initialize a persistent MQTT client
+# mqtt_client = mqtt.Client()
+# mqtt_client.connect(MQTT_BROKER, MQTT_PORT, keepalive=60)
+# mqtt_client.loop_start()
 
 # Create a Kalman filter for the deviation variable
 kalman_dev = cv2.KalmanFilter(1, 1)
@@ -193,7 +210,7 @@ if __name__ == '__main__':
                 # shared‑mem image mode
                 frame = frame_view  # zero‑copy NumPy view
 
-            ''' Detect the lane every 2 frames not at each frame
+            '''Detect the lane every 2 frames not at each frame
             every 5th frame, update model; else reuse avg'''
             update = (frame_counter % 1 == 0)
             status = road_lines_status(frame, update_model=update)
