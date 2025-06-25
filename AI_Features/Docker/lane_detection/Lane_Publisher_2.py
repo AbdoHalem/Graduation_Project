@@ -41,17 +41,32 @@ kalman_dev.errorCovPost = np.array([[1]], np.float32)
 
 # ─── CONFIGURE INPUT MODE HERE ────────────────────────────────────────────────
 # Choose one of: 'camera', 'video', 'image'
-input_type   = 'image'
-#  For 'video', set this to your video file.
+input_type   = 'video'      # default
+FRAME_INTERVAL = 5          # Process every nth frame (default)
+input_source = None
+
+# Read MY_SETTING, default to "home"
+my_value = os.getenv("Video_Source", "home")
+if(my_value == "home"):
+    input_source = r'Video/Home_Simulation2.mp4'             # Required for 'video' or 'image' (for linux)
+elif(my_value == "street"):
+    input_source = r'Video/Street_Simulation.mp4'
+    FRAME_INTERVAL = 7
+elif(my_value == "camera"):
+    input_type = "image"        # To read process from SHM buffer in RAM not directly from the camera
+    input_source = r'.'
+    FRAME_INTERVAL = 1
+# For 'video', set this to your video file.
 # For **socket**-based image mode, set input_source = None
 # Ignored when input_type == 'camera'
-input_source = None
+
 # ────────────────────────────────────────────────────────────────────────────────
 
 # Shared‑memory config (must match your publisher)
-SHM_PATH    = "/dev/shm/frame_buf"
-W, H, C     = 640, 480, 3
-BUF_SIZE    = W * H * C
+if (input_type == 'image'):
+    SHM_PATH    = "/dev/shm/frame_buf"
+    W, H, C     = 640, 480, 3
+    BUF_SIZE    = W * H * C
 
 def initialize_source(input_type, input_source=None):
     """
@@ -210,15 +225,15 @@ if __name__ == '__main__':
                 # shared‑mem image mode
                 frame = frame_view  # zero‑copy NumPy view
 
-            '''Detect the lane every 2 frames not at each frame
+            '''Detect the lane every FRAME_INTERVAL frames not at each frame
             every 5th frame, update model; else reuse avg'''
-            update = (frame_counter % 1 == 0)
+            update = (frame_counter % FRAME_INTERVAL == 0)
             status = road_lines_status(frame, update_model=update)
-
+            print("Lane status:", status)
             # publish only on change
             if status != last_status:
                 mqtt_client.publish(MQTT_TOPIC, str(status))
-                print("Lane status:", status)
+                # print("Lane status:", status)
                 last_status = status
 
             frame_counter += 1
