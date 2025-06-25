@@ -37,6 +37,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application code
 COPY DockerFile Lane_Publisher_2.py CNN_model.tflite /app/
+COPY Video /app/Video
 
 # Expose the port the app runs on
 EXPOSE 5000
