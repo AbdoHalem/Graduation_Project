@@ -28,6 +28,16 @@ ONNX stands for Open Neural Network Exchange. It is an open standard format desi
 
 #### The CNN recognition model using dynamic quantization from floating-point precision to INT8 precision.
 
-On **DockerHub**, you will find 2 images:
+On **DockerHub**, you will find 4 images:
 1- halem10/sign_publisher:1.1 for receiving frames via socket from RPI4 host
-2- halem10/sign_publisher:1.2 for receiving frames from RAM through IPC
+2- halem10/sign_publisher:1.2 for receiving frames from RAM through IPC via mosquitto broker
+3- halem10/sign_publisher:1.3 for receiving frames from RAM through IPC via private mqtt broker
+4- halem10/sign_publisher:1.4 for process frames from video simulation via private mqtt broker
+to select which video to process frame from it, pass a "home" or "street" to the "Video_Source" env variable like this:
+docker build -t halem10/sign_feature:2.2 .
+docker run --rm \
+  -e Video_Source=street \              # Input types are *"street" or "home" or "camera"*
+  --device /dev/video0 \
+  halem10/sign_feature:1.4
+
+
