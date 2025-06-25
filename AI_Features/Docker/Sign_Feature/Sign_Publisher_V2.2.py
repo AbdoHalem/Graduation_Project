@@ -274,10 +274,23 @@ if __name__ == "__main__" :
     # Get the detection model and video paths
     root = os.getcwd()
     detection_model_path = r'detection_model/best_quant_v2.onnx'     # for linux
-    input_type = 'image'                                        # Change to 'image' or 'camera' as needed
-    input_source = r'.'                     # Required for 'video' or 'image' (for linux)
+    input_type = 'video'                                        # Change to 'image' or 'camera' as needed    
+    FRAME_INTERVAL = 7          # Process every nth frame (default)
+    input_source = "home"       # default value
 
-    if input_type == 'image':
+    # Read MY_SETTING, default to "world"
+    my_value = os.getenv("Video_Source", "home")
+    if(my_value == "home"):
+        input_source = r'Video/Home_Simulation2.mp4'             # Required for 'video' or 'image' (for linux)
+    elif(my_value == "street"):
+        input_source = r'Video/Street_Simulation.mp4'
+        FRAME_INTERVAL = 3
+    elif(my_value == "camera"):
+        input_type = "image"        # To read process from SHM buffer in RAM not directly from the camera
+        input_source = r'.'
+        FRAME_INTERVAL = 1
+
+    if input_type == 'image':       # Initialze the memory buffer
         fd = os.open(SHM_PATH, os.O_RDONLY)
         shm = mmap.mmap(fd, BUF_SIZE, flags=mmap.MAP_SHARED, prot=mmap.PROT_READ)
         # Build a zero-copy NumPy view onto the shared buffer
@@ -288,7 +301,7 @@ if __name__ == "__main__" :
     confidence_threshold = 0.34
 
     # New variables for frame skipping and duplicate detection
-    FRAME_INTERVAL = 1          # Process every 5th frame
+    
     last_sign = None            # Track last sent sign
     frame_counter = 0           # Count processed frames
 
