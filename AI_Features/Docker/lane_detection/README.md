@@ -12,4 +12,12 @@ Notice that the req_2.txt file is the one we use to install the libraries on RPI
 
 On **DockerHub**, you will find 2 images:
 1- halem10/lane_publisher:1.0 for receiving frames via socket from RPI4 host
-2- halem10/lane_publisher:1.1 for receiving frames from RAM through IPC
+2- halem10/lane_publisher:1.1 for receiving frames from RAM through IPC and send status on mosquitto broker
+3- halem10/lane_publisher:1.2 for receiving frames from RAM through IPC and send status on private broker
+4- halem10/lane_publisher:1.3 for process frames from video simulation via private mqtt broker
+to select which video to process frame from it, pass a "home" or "street" to the "Video_Source" env variable like this:
+docker build -t halem10/lane_publisher:1.3 .
+docker run --rm \
+  -e Video_Source=street \              # Input types are *"street" or "home" or "camera"*
+  --device /dev/video0 \
+  halem10/sign_feature:1.4
