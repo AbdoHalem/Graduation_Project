@@ -39,6 +39,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY DockerFile Sign_Publisher_V2.2.py /app/
 COPY detection_model /app/detection_model
 COPY recognition_model /app/recognition_model
+COPY Video /app/Video
 
 # Expose the port the app runs on
 EXPOSE 6000
