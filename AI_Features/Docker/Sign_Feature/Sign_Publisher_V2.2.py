@@ -278,7 +278,7 @@ if __name__ == "__main__" :
     FRAME_INTERVAL = 7          # Process every nth frame (default)
     input_source = "home"       # default value
 
-    # Read MY_SETTING, default to "world"
+    # Read MY_SETTING, default to "home"
     my_value = os.getenv("Video_Source", "home")
     if(my_value == "home"):
         input_source = r'Video/Home_Simulation2.mp4'             # Required for 'video' or 'image' (for linux)
