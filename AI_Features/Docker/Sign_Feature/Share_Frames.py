@@ -1,3 +1,5 @@
+'''This file is used in the raspbian bullsye image or the laptop to write frames in the SHM memory buffer
+'''
 import cv2
 import os
 import mmap
@@ -8,7 +10,7 @@ import time
 SHM_PATH    = "/dev/shm/frame_buf"       # shared memory file
 FRAME_W     = 640
 FRAME_H     = 480
-FRAME_C     = 3                         # BGR
+FRAME_C     = 3                          # BGR
 BUF_SIZE = FRAME_W * FRAME_H * FRAME_C
 
 # Create/truncate backing file once
@@ -30,8 +32,8 @@ gst_pipeline = (
     "appsink"
 )
 
-cap = cv2.VideoCapture(gst_pipeline, cv2.CAP_GSTREAMER)
-# cap = cv2.VideoCapture(0)
+# cap = cv2.VideoCapture(gst_pipeline, cv2.CAP_GSTREAMER)
+cap = cv2.VideoCapture(0)
 
 if not cap.isOpened():
     raise RuntimeError("Failed to open GStreamer pipeline")
