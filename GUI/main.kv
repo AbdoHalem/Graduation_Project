@@ -8,12 +8,14 @@ ScreenManager:
     Subscreen3:
     Subscreen4:
     Subscreen5:
+    Subscreen6:
     Drowsy:
     Sign:
     Lane:
     CollisionAvoidance:
     BlindSpot:
-
+    ADAS:
+  
 <MainScreen>:
     name: "main"
     MDBoxLayout:
@@ -77,6 +79,8 @@ ScreenManager:
             font_style: "H6"
 
 
+
+
 <SecondPathScreen>:
     name: "second"
 
@@ -98,12 +102,12 @@ ScreenManager:
                 text_color: 0.2, 0.2, 0.2, 1
                 halign: 'center'
 
-
             MDRaisedButton:
-                text: "Music"
+                text: "Auto Parking"
                 size_hint: 0.18, 0.18
                 pos_hint: {"center_x": 0.1, "center_y": 0.5}
-                on_release: app.root.current = "sub1"
+                on_release: app.root.current = "sub6"
+
 
             MDRaisedButton:
                 text: "FOTA"
@@ -130,17 +134,10 @@ ScreenManager:
                 on_release: app.root.current = "sub5"
 
 
+
 <Subscreen1>:
     name: "sub1"
-    MDBoxLayout:
-        orientation: "vertical"
-        MDTopAppBar:
-            title: "Back to MainWindow"
-            left_action_items: [["arrow-left", lambda x: setattr(app.root, 'current', 'second')]]
-        MDLabel:
-            text: "Subscreen 1"
-            halign: "center"
-           
+     
 
 <Subscreen2>:
     name: "sub2"
@@ -162,7 +159,6 @@ ScreenManager:
                 bold: True
                 theme_text_color: "Custom"
                 text_color: "#00897B"  #other colors: "#00695C" or   "#26A69A"
-                halign: 'center'
 
             MDSeparator:
 
@@ -281,15 +277,16 @@ ScreenManager:
                             icon: "sleep"
                             size_hint: 1, 0.5
                             on_release: 
+                                app.root.get_screen("drowsy").toggle_drowsy_enable()
                                 root.ids.screen_manager.current = "drowsy"
                                 self.md_bg_color = app.theme_cls.accent_color
-                            
-                        
+                
                         MDRectangleFlatIconButton:
                             text: "Sign Recognition"
                             icon: "traffic-light"
                             size_hint: 1, 0.5
                             on_release: 
+                                app.root.get_screen("sign").toggle_sign_enable()
                                 root.ids.screen_manager.current = "sign"
                                 self.md_bg_color = app.theme_cls.accent_color
                         
@@ -298,6 +295,7 @@ ScreenManager:
                             icon: "road-variant"
                             size_hint: 1, 0.5
                             on_release: 
+                                app.root.get_screen("lane").toggle_lane_enable()
                                 root.ids.screen_manager.current = "lane"
                                 self.md_bg_color = app.theme_cls.accent_color
                         
@@ -316,7 +314,14 @@ ScreenManager:
                             on_release: 
                                 root.ids.screen_manager.current = "collision_avoidance"
                                 self.md_bg_color = app.theme_cls.accent_color
-                
+
+                        MDRectangleFlatIconButton:
+                            text: "All-in-One"
+                            icon: "car"
+                            size_hint: 1, 0.5
+                            on_release: 
+                                root.ids.screen_manager.current = "adas"
+                                self.md_bg_color = app.theme_cls.accent_color
                 # Bottom spacer
                 Widget:
             
@@ -339,129 +344,135 @@ ScreenManager:
                 CollisionAvoidance:
                     name: "collision_avoidance"
 
+                ADAS:
+                    name: "adas"
+
 <Subscreen4>:
     name: "sub4"
     md_bg_color: 1, 1, 1, 1
 
     MDBoxLayout:
         orientation: "vertical"
+
         MDTopAppBar:
             title: "Back to MainWindow"
             left_action_items: [["arrow-left", lambda x: setattr(app.root, 'current', 'second')]]
-        MDBoxLayout:
-            orientation: "vertical"
-            spacing: "20dp"
-            padding: "20dp"
-            pos_hint: {"center_x": 0.5, "center_y": 0.5}
-            size_hint: 0.95, None
-            height: self.minimum_height
 
-            MDLabel:
-                id: city_label
-                text: "Alexandria"
-                halign: "center"
-                font_style: "H4"
-                theme_text_color: "Primary"
-
-            MDLabel:
-                id: datetime_label
-                text: "Loading..."
-                halign: "center"
-                font_style: "Subtitle2"
-                theme_text_color: "Secondary"
-
-            MDCard:
-                orientation: "horizontal"
-                padding: "16dp"
-                radius: [12,]
-                elevation: 4
-                md_bg_color: 0.95, 0.95, 1, 1
+        ScrollView:
+            MDBoxLayout:
+                orientation: "vertical"
+                spacing: "20dp"
+                padding: "20dp"
                 size_hint_y: None
-                height: "80dp"
+                height: self.minimum_height
+                pos_hint: {"center_x": 0.5, "top": 1}
+                size_hint_x: 0.95
 
-                MDIcon:
-                    icon: "thermometer"
+                MDLabel:
+                    id: city_label
+                    text: "Alexandria"
                     halign: "center"
+                    font_style: "H4"
                     theme_text_color: "Primary"
 
                 MDLabel:
-                    id: temp_label
-                    text: "Temperature: ..."
-                    halign: "left"
-                    font_style: "H6"
-
-            MDCard:
-                orientation: "horizontal"
-                padding: "16dp"
-                radius: [12,]
-                elevation: 4
-                md_bg_color: 0.95, 1, 0.95, 1
-                size_hint_y: None
-                height: "80dp"
-
-                MDIcon:
-                    icon: "weather-cloudy"
+                    id: datetime_label
+                    text: "Loading..."
                     halign: "center"
-                    theme_text_color: "Primary"
+                    font_style: "Subtitle2"
+                    theme_text_color: "Secondary"
+
+                MDCard:
+                    orientation: "horizontal"
+                    padding: "16dp"
+                    radius: [12,]
+                    elevation: 4
+                    md_bg_color: 0.95, 0.95, 1, 1
+                    size_hint_y: None
+                    height: "80dp"
+
+                    MDIcon:
+                        icon: "thermometer"
+                        halign: "center"
+                        theme_text_color: "Primary"
+
+                    MDLabel:
+                        id: temp_label
+                        text: "Temperature: ..."
+                        halign: "left"
+                        font_style: "H6"
+
+                MDCard:
+                    orientation: "horizontal"
+                    padding: "16dp"
+                    radius: [12,]
+                    elevation: 4
+                    md_bg_color: 0.95, 1, 0.95, 1
+                    size_hint_y: None
+                    height: "80dp"
+
+                    MDIcon:
+                        icon: "weather-cloudy"
+                        halign: "center"
+                        theme_text_color: "Primary"
+
+                    MDLabel:
+                        id: desc_label
+                        text: "Weather: ..."
+                        halign: "left"
+                        font_style: "H6"
+
+                MDCard:
+                    orientation: "horizontal"
+                    padding: "16dp"
+                    radius: [12,]
+                    elevation: 4
+                    md_bg_color: 1, 0.95, 0.95, 1
+                    size_hint_y: None
+                    height: "80dp"
+
+                    MDIcon:
+                        icon: "weather-windy"
+                        halign: "center"
+                        theme_text_color: "Primary"
+
+                    MDLabel:
+                        id: wind_label
+                        text: "Wind Speed: ..."
+                        halign: "left"
+                        font_style: "H6"
+
+                MDCard:
+                    orientation: "horizontal"
+                    padding: "16dp"
+                    radius: [12,]
+                    elevation: 4
+                    md_bg_color: 0.95, 1, 1, 1
+                    size_hint_y: None
+                    height: "80dp"
+
+                    MDIcon:
+                        icon: "eye-outline"
+                        halign: "center"
+                        theme_text_color: "Primary"
+
+                    MDLabel:
+                        id: vis_label
+                        text: "Visibility: ..."
+                        halign: "left"
+                        font_style: "H6"
 
                 MDLabel:
-                    id: desc_label
-                    text: "Weather: ..."
-                    halign: "left"
-                    font_style: "H6"
-
-            MDCard:
-                orientation: "horizontal"
-                padding: "16dp"
-                radius: [12,]
-                elevation: 4
-                md_bg_color: 1, 0.95, 0.95, 1
-                size_hint_y: None
-                height: "80dp"
-
-                MDIcon:
-                    icon: "weather-windy"
+                    id: warning_label
+                    text: ""
                     halign: "center"
-                    theme_text_color: "Primary"
-
-                MDLabel:
-                    id: wind_label
-                    text: "Wind Speed: ..."
-                    halign: "left"
                     font_style: "H6"
+                    theme_text_color: "Error"
 
-            MDCard:
-                orientation: "horizontal"
-                padding: "16dp"
-                radius: [12,]
-                elevation: 4
-                md_bg_color: 0.95, 1, 1, 1
-                size_hint_y: None
-                height: "80dp"
-
-                MDIcon:
-                    icon: "eye-outline"
-                    halign: "center"
-                    theme_text_color: "Primary"
-
-                MDLabel:
-                    id: vis_label
-                    text: "Visibility: ..."
-                    halign: "left"
-                    font_style: "H6"
-
-            MDLabel:
-                id: warning_label
-                text: ""
-                halign: "center"
-                font_style: "H6"
-                theme_text_color: "Error"
-
-            MDRaisedButton:
-                text: "Refresh"
-                pos_hint: {"center_x": 0.5}
-                on_release: root.manual_refresh()
-
+                MDRaisedButton:
+                    text: "Refresh"
+                    pos_hint: {"center_x": 0.5}
+                    on_release: root.manual_refresh()
 
 <Subscreen5>:
     name: "sub5"
@@ -471,9 +482,8 @@ ScreenManager:
             title: "Back to MainWindow"
             left_action_items: [["arrow-left", lambda x: setattr(app.root, 'current', 'second')]]
         MDFloatLayout:
-            md_bg_color: 0.98, 0.98, 0.98, 1  # خلفية فاتحة
+            md_bg_color: 0.98, 0.98, 0.98, 1  
 
-            # العنوان الرئيسي
             MDLabel:
                 text: "Emergency Assistance"
                 halign: "center"
@@ -509,9 +519,8 @@ ScreenManager:
                 line_color: 0.7, 0, 0, 1 
                 on_release:  root.send_emergency_messages()
 
-            # فاصل بديل بدون MDSeparator
             MDLabel:
-                text: "_" * 50  # خط أفقي بدائي
+                text: "_" * 50  
                 halign: "center"
                 pos_hint: {"center_x": 0.5, "center_y": 0.52}
                 theme_text_color: "Hint"
@@ -569,8 +578,86 @@ ScreenManager:
                     line_color: 1, 0.7, 0.7, 1
                     size_hint_x: 1
 
+<Subscreen6>:
+    name: "sub6"
+    MDBoxLayout:
+        orientation: "vertical"
+        MDTopAppBar:
+            title: "Back to MainWindow"
+            elevation: 4
+            left_action_items: [["arrow-left", lambda x: setattr(app.root, 'current', 'second')]]
 
+        MDBoxLayout:
+            orientation: "vertical"
+            padding: dp(20)
+            spacing: dp(20)
+
+            MDLabel:
+                text: "Auto Parking Mode"
+                halign: "center"
+                font_style: "H3"
+                bold: True
+                theme_text_color: "Custom"
+                text_color: "#00897B"  
+
+            MDBoxLayout:
+                orientation: "horizontal"
+                spacing: dp(20)
+                size_hint_y: None
+                height: self.minimum_height
+                pos_hint: {"center_x": 0.5}
+
+                MDLabel:
+                    text: "Enable:"
+                    size_hint_x: None
+                    width: dp(70)
+                    halign: "right"
+                    theme_text_color: "Custom"
+                    text_color: "#26A69A" 
+                    #other colors: "#00695C" or   "#26A69A"
+
+                MDSwitch:
+                    id: auto_parking_switch
+                    on_active: root.toggle_auto_parking(*args)
+
+            MDLabel:
+                id: parking_status
+                text: "Status: Waiting for activation..."
+                halign: "center"
+                theme_text_color: "Secondary"
+                font_style: "Subtitle1"
+
+            MDRoundFlatIconButton:
+                text: "Emergency Stop"
+                icon: "alert"
+                md_bg_color: (1, 0.2, 0.2, 1)
+                text_color: 0.4, 0.1, 0.1, 1
+                icon_color: 0.4, 0.1, 0.1, 1
+                line_color: 1, 0.7, 0.7, 1
+                pos_hint: {"center_x": 0.5}
+                on_release: root.stop_auto_parking()
+
+            MDCard:
+                orientation: "vertical"
+                size_hint_y: None
+                height: dp(200)
+                padding: dp(10)
+                md_bg_color: app.theme_cls.bg_light
+                elevation: 4
+
+                MDLabel:
+                    text: "Parking Activity Log"
+                    font_style: "H5"
+                    theme_text_color: "Custom"
+                    text_color: "#00695C"
+                    size_hint_y: None
+                    height: self.texture_size[1]
+
+                ScrollView:
+                    MDList:
+                        id: parking_log
 <Drowsy>:
+    name: "drowsy"
     AnchorLayout:
         anchor_y: "top"
         MDBoxLayout:
@@ -1038,17 +1125,184 @@ ScreenManager:
                             font_size: dp(80)
                             pos_hint: {"x": 0, "center_y": 0.5}
      
-                MDLabel:
-                    id: bsw_status
-                    text: "NO Blind Spot Message .."
-                    halign: "center"
-                    theme_text_color: "Custom"
+                        MDLabel:
+                            id: bsw_status
+                            text: "NO Blind Spot Message .."
+                            halign: "center"
+                            theme_text_color: "Custom"
+                            text_color: 0, 0, 0, 1  # R, G, B, Alpha = Black
+                            size_hint_y: None
+                            height: self.texture_size[1]
+
+<ADAS>:
+    MDBoxLayout:
+        orientation: "vertical"
+        padding: dp(16)
+        spacing: dp(16)
+
+        MDLabel:
+            text: "ADAS Features Monitor"
+            halign: "center"
+            font_style: "H4"
+            size_hint_y: None
+            height: self.texture_size[1]
+
+        AnchorLayout:
+            anchor_y: "top" 
+
+            MDCard:
+                size_hint_x: 0.9
+                size_hint_y: None
+                height: dp(330) 
+                pos_hint: {"center_x": 0.5}
+                padding: dp(16)
+                spacing: dp(16)
+                orientation: 'vertical'
+                radius: [20, 20, 20, 20]
+                md_bg_color: (0.678, 0.847, 0.902, 0.3)
+
+                FloatLayout:
+                    Image:
+                        id: road_background
+                        source: "img/road.png"
+                        allow_stretch: True
+                        keep_ratio: True
+                        fit_mode: "contain"
+                        size_hint: 1, 1
+                        pos_hint: {"center_x": 0.5, "center_y": 0.5}
+
+                    Image:
+                        id: car_adas
+                        source: "img/car2.png"
+                        size_hint: None, None
+                        size: dp(60), dp(60)
+                        pos_hint: {"center_x": 0.5, "center_y": 0.5}
+
+                    MDIcon:
+                        id: front_icon
+                        icon: "arrow-up-bold"
+                        font_size: dp(50)
+                        theme_text_color: "Custom"
+                        text_color: 1, 0, 0, 0
+                        pos_hint: {"center_x": 0.5, "top": 1}
+
+                    MDIcon:
+                        id: back_icon
+                        icon: "arrow-down-bold"
+                        font_size: dp(50)
+                        theme_text_color: "Custom"
+                        text_color: 1, 0, 0, 0
+                        pos_hint: {"center_x": 0.5, "y": 0}
+
+                    MDIcon:
+                        id: right_icon
+                        icon: "eye-off-outline"
+                        font_size: dp(50)
+                        theme_text_color: "Custom"
+                        text_color: 1, 0, 0, 0
+                        pos_hint: {"right": 1, "center_y": 0.5}
+
+                    MDIcon:
+                        id: left_icon
+                        icon: "eye-off-outline"
+                        font_size: dp(50)
+                        theme_text_color: "Custom"
+                        text_color: 1, 0, 0, 0
+                        pos_hint: {"x": 0, "center_y": 0.5}
+
+                    BoxLayout:
+                        size_hint: None, None
+                        size: dp(70), dp(100)
+                        pos_hint: {"x": 0.2, "y": 0.3}
+                        orientation: 'vertical'
+                        spacing: dp(2)
+
+                        MDLabel:
+                            id : sign_head1
+                            text: "sign 1"
+                            halign: "center"
+                            theme_text_color: "Custom"
+                            text_color: "#00695C"
+                            font_style: "Caption"
+                            opacity: 0
+
+                        Image:
+                            id: sign1
+                            source: ""
+                            allow_stretch: True
+                            keep_ratio: True
+                            opacity: 0
+
+                        MDLabel:
+                            id: desc1
+                            text: ""
+                            halign: "center"
+                            theme_text_color: "Custom"
+                            text_color: "#00695C"
+                            font_style: "Caption"
+
+                    BoxLayout:
+                        size_hint: None, None
+                        size: dp(70), dp(100)
+                        pos_hint: {"right": 0.8, "y": 0.3}
+                        orientation: 'vertical'
+                        spacing: dp(2)
+
+                        MDLabel:
+                            id : sign_head2
+                            text: "Sign 2"
+                            halign: "center"
+                            theme_text_color: "Custom"
+                            text_color: "#00695C"
+                            font_style: "Caption"
+                            opacity: 0
+
+                        Image:
+                            id: sign2
+                            source: ""
+                            allow_stretch: True
+                            keep_ratio: True
+                            opacity: 0
+
+                        MDLabel:
+                            id: desc2
+                            text: ""
+                            halign: "center"
+                            theme_text_color: "Custom"
+                            text_color: "#00695C"
+                            font_style: "Caption"
+
+                    MDIcon:
+                        id: alert_icon_adas
+                        icon: "alert"
+                        font_size: dp(70)
+                        theme_text_color: "Custom"
+                        text_color: 1, 0, 0, 0
+                        pos_hint: {"center_x": 0.7, "y": 0}
+                        size_hint: None, None
+                        size: dp(70), dp(70)
+                BoxLayout:
+                    orientation: "horizontal"
+                    spacing: dp(10)
                     size_hint_y: None
-                    height: self.texture_size[1]
-                    #text_color: (1, 1, 1, 1)
+                    height: dp(40)
+                    padding: dp(10), 0
+                    pos_hint: {"center_x": 0.5}
 
+                    Image:
+                        id : adas_img
+                        source: ""  
+                        size_hint: None, None
+                        size: dp(24), dp(24)
+                        allow_stretch: True
+                        opacity:0
 
- 
-
-
-
+                    MDLabel:  
+                        id: status 
+                        text: ""
+                        halign: "left"
+                        valign: "middle"
+                        theme_text_color: "Custom"
+                        text_color: "#00695C"
+                        font_style: "Body1"
+                        
