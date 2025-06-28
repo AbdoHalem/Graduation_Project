@@ -85,7 +85,7 @@ class FaceRecognitionHandler:
                 screen.ids.enter_button.opacity = 0
                 screen.ids.enter_button.disabled = True
 
-                Clock.schedule_once(lambda _: self.app.change_screen("second"), 15)
+                Clock.schedule_once(lambda _: self.app.change_screen("second"), 3)
 
             elif "Unknown face" in message:
                 print("Unknown face detected.")
