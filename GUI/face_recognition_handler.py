@@ -41,7 +41,7 @@ class FaceRecognitionHandler:
     def start_face_timer(self):
         if self.timer_event:
             self.timer_event.cancel()
-        self.timer_event = Clock.schedule_once(self.prompt_password_due_to_timeout, 5)  # 5s timeout
+        self.timer_event = Clock.schedule_once(self.prompt_password_due_to_timeout, 30)  # 30s timeout
 
     def prompt_password_due_to_timeout(self, dt):
         print("⏰ Timeout: No face recognized, prompting for password.")
